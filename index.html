@@ -1,35 +1,247 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jester – Lista Spesa</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jester – Assistente Vocale</title>
 
-  <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --green:#4CAF50;
+      --light:#f4f4f4;
+      --white:#fff;
+      --gray:#ddd;
+      --shadow:rgba(0,0,0,.1);
+    }
+    *{box-sizing:border-box;}
+    body{font-family:'Segoe UI',sans-serif;margin:0;background:var(--light);color:#333;}
 
-  <!-- Foglio di stile -->
-  <link rel="stylesheet" href="assets/style.css" />
+    /* ---------- HEADER ---------- */
+    header{background:var(--green);color:#fff;padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;}
+    header h1{font-size:1.2rem;margin:0;}
+    header nav button{background:none;border:none;color:#fff;font-size:1.6rem;cursor:pointer;}
+
+    /* ---------- NAV-MENU ---------- */
+    .nav-menu{position:fixed;top:0;left:-240px;width:220px;height:100%;background:var(--white);box-shadow:2px 0 5px var(--shadow);padding:1rem;transition:left .3s;}
+    .nav-menu.open{left:0;}
+    .nav-menu h2{font-size:1rem;margin-top:0;}
+    .nav-menu ul{list-style:none;padding:0;margin:0;}
+    .nav-menu li{margin:.5rem 0;}
+    .nav-menu a{text-decoration:none;color:#333;font-weight:bold;}
+
+    /* ---------- MAIN & CARDS ---------- */
+    main{padding:1rem;max-width:800px;margin:auto;}
+    section{margin-bottom:2rem;}
+    .card{background:var(--white);border-radius:10px;box-shadow:0 0 10px var(--shadow);padding:1rem;margin:1rem 0;}
+    .buttons{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin:1rem 0;}
+    button{padding:.8rem 1.2rem;border:none;border-radius:8px;background:var(--green);color:#fff;font-size:1rem;cursor:pointer;transition:.2s;}
+    button:hover{background:#45a049;}
+
+    #output{white-space:pre-line;font-family:monospace;background:var(--white);padding:1rem;border-radius:8px;box-shadow:0 0 5px var(--shadow);}
+
+    @media(max-width:600px){
+      .buttons{flex-direction:column;align-items:stretch;}
+    }
+  </style>
 </head>
 <body>
 
-  <header class="app-header">
-    <h1 class="title">La mia Lista</h1>
+  <!-- ===== HEADER ===== -->
+  <header>
+    <h1>🎤 Jester</h1>
+    <nav>
+      <button id="menuToggle">☰</button>
+    </nav>
   </header>
 
+  <!-- ===== SIDE MENU ===== -->
+  <aside id="navMenu" class="nav-menu">
+    <h2>📂 Menu</h2>
+    <ul>
+      <li><a href="#home"        onclick="closeMenu()">🏠 Home</a></li>
+      <li><a href="#liste"       onclick="closeMenu()">🛒 Liste</a></li>
+      <li><a href="#acquisti"    onclick="closeMenu()">✅ Acquisti</a></li>
+      <li><a href="#preferiti"   onclick="closeMenu()">🌟 Preferiti</a></li>
+      <li><a href="#statistiche" onclick="closeMenu()">📊 Statistiche</a></li>
+      <li><a href="#impostazioni"onclick="closeMenu()">⚙️ Impostazioni</a></li>
+    </ul>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
   <main>
-    <ul id="lista" class="lista"></ul>
+    <!-- HOME -->
+    <section id="home" class="card">
+      <h2>🏠 Home</h2>
+      <p>Benvenuto in Jester, il tuo assistente vocale personale per la spesa e il controllo delle scorte. Usa i comandi vocali o i pulsanti per iniziare.</p>
+    </section>
+
+    <!-- LISTE -->
+    <section id="liste" class="card">
+      <h2>🛒 Liste</h2>
+      <div class="buttons">
+        <button onclick="preparaSpesa()">🧺 Prepara Spesa</button>
+        <button onclick="document.getElementById('cameraInput').click()">📷 Scatta Foto (Scontrino)</button>
+      </div>
+
+      <h3>Lista Supermercato</h3>
+      <ul id="lista-supermercato"></ul>
+
+      <h3>Lista Online</h3>
+      <ul id="lista-online"></ul>
+
+      <!-- input nascosto per foto -->
+      <input id="cameraInput" type="file" accept="image/*" capture="environment" style="display:none" onchange="handlePhotoUpload(event)">
+    </section>
+
+    <!-- ACQUISTI -->
+    <section id="acquisti" class="card">
+      <h2>✅ Acquisti</h2>
+      <p>I prodotti già acquistati saranno spuntati automaticamente o possono essere segnati manualmente.</p>
+    </section>
+
+    <!-- PREFERITI -->
+    <section id="preferiti" class="card">
+      <h2>🌟 Preferiti</h2>
+      <form onsubmit="aggiungiPreferito(event)">
+        <label for="nome-preferito">Nome prodotto:</label><br>
+        <input id="nome-preferito" type="text" required style="margin:.5rem 0;padding:.3rem;max-width:300px;width:100%;">
+        <button type="submit">➕ Aggiungi ai preferiti</button>
+      </form>
+      <ul id="lista-preferiti"></ul>
+    </section>
+
+    <!-- STATISTICHE -->
+    <section id="statistiche" class="card">
+      <h2>📊 Statistiche</h2>
+      <div id="stats-output" style="font-family:monospace;"></div>
+      <div style="margin-top:1rem;">
+        <label>Completamento della lista:</label>
+        <div style="background:#eee;border-radius:8px;overflow:hidden;max-width:400px;width:100%;">
+          <div id="progress-bar" style="height:20px;background:#4CAF50;width:0%;transition:width .5s;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- IMPOSTAZIONI -->
+    <section id="impostazioni" class="card">
+      <h2>⚙️ Impostazioni</h2>
+      <p>Personalizza Jester: gestisci il budget, ripristina dati o modifica le preferenze vocali.</p>
+    </section>
+
+    <!-- OUTPUT -->
+    <div id="output" class="card">📝 Output vocale e messaggi appariranno qui...</div>
   </main>
 
-  <footer class="controls">
-    <button id="btn-add"   class="btn primary">+ Aggiungi</button>
-    <button id="btn-voice" class="btn secondary">🎤 Voce</button>
-    <button id="btn-scan"  class="btn secondary">📷 Scontrino</button>
-  </footer>
+  <!-- ===== SCRIPT ===== -->
+  <script>
+  /* === VARIABILI GLOBALI === */
+  const utenteAttivo = 'default';
+  const navMenu      = document.getElementById('navMenu');
+  const outputEl     = document.getElementById('output');
 
-  <!-- OCR -->
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-  <!-- Logica -->
-  <script src="assets/script.js"></script>
+  /* === LISTE === */
+  const ulSupermercato = document.getElementById('lista-supermercato');
+  const ulOnline       = document.getElementById('lista-online');
+
+  /* === PREFERITI === */
+  let preferiti = getLS('preferiti');
+  const listaPreferiti = document.getElementById('lista-preferiti');
+
+  /* === FUNZIONI UTILI === */
+  function getLS(key, def = []) { return JSON.parse(localStorage.getItem(`jester_${utenteAttivo}_${key}`)) || def; }
+  function setLS(key, val)     { localStorage.setItem(`jester_${utenteAttivo}_${key}`, JSON.stringify(val)); }
+
+  /* === MENU === */
+  document.getElementById('menuToggle').addEventListener('click', () => navMenu.classList.toggle('open'));
+  function closeMenu(){ navMenu.classList.remove('open'); }
+
+  /* === LISTE === */
+  function caricaListe(){
+    const sm = getLS('supermercato');
+    const on = getLS('online');
+    ulSupermercato.innerHTML = sm.map((p,i)=>`<li>${p} <button onclick="rimuoviElementoLista('supermercato',${i})">❌</button></li>`).join('');
+    ulOnline.innerHTML       = on.map((p,i)=>`<li>${p} <button onclick="rimuoviElementoLista('online',${i})">❌</button></li>`).join('');
+  }
+  function rimuoviElementoLista(tipo, idx){
+    const lista = getLS(tipo);
+    lista.splice(idx,1);
+    setLS(tipo, lista);
+    caricaListe(); aggiornaStatistiche();
+  }
+
+  /* === PREFERITI === */
+  function aggiornaPreferiti(){
+    listaPreferiti.innerHTML = preferiti.map((p,i)=>`<li>${p} <button onclick="rimuoviPreferito(${i})">❌</button></li>`).join('');
+  }
+  function aggiungiPreferito(e){
+    e.preventDefault();
+    const val = document.getElementById('nome-preferito').value.trim();
+    if(val && !preferiti.includes(val)){
+      preferiti.push(val);
+      setLS('preferiti', preferiti);
+      aggiornaPreferiti();
+    }
+    e.target.reset();
+  }
+  function rimuoviPreferito(i){
+    preferiti.splice(i,1);
+    setLS('preferiti', preferiti);
+    aggiornaPreferiti();
+  }
+
+  /* === STATISTICHE === */
+  function aggiornaStatistiche(){
+    const sm  = getLS('supermercato');
+    const on  = getLS('online');
+    const acqSm = getLS('acquisti_supermercato');
+    const acqOn = getLS('acquisti_online');
+    const tot   = sm.length + on.length + acqSm.length + acqOn.length || 1;
+    const perc  = Math.round(((acqSm.length + acqOn.length)/tot)*100);
+
+    document.getElementById('stats-output').innerText =
+`Totale in lista supermercato: ${sm.length}
+Totale in lista online:        ${on.length}
+Acquistati supermercato:       ${acqSm.length}
+Acquistati online:             ${acqOn.length}
+Prodotti totali acquistati:    ${acqSm.length + acqOn.length}
+Percentuale lista completata:  ${perc}%`;
+
+    const bar = document.getElementById('progress-bar');
+    bar.style.width = perc + '%';
+    bar.style.background = perc < 33 ? '#e53935' : perc < 66 ? '#fbc02d' : '#4CAF50';
+  }
+
+  /* === PREPARA SPESA === */
+  function preparaSpesa(){
+    const nuovaSm = getLS('supermercato').filter(p=>!getLS('acquisti_supermercato').includes(p));
+    const nuovaOn = getLS('online').filter(p=>!getLS('acquisti_online').includes(p));
+    setLS('supermercato', nuovaSm);
+    setLS('online', nuovaOn);
+    caricaListe(); aggiornaStatistiche();
+    outputEl.innerText = '🧺 Spesa aggiornata: rimossi i prodotti già acquistati.';
+  }
+
+  /* === OCR SCONTRINO (SIMULATO) === */
+  function handlePhotoUpload(e){
+    const file = e.target.files[0];
+    if(!file){ return; }
+
+    // Simulazione OCR
+    const prodotti = ['latte','uova','caffe'];
+    const conferma = prompt(`📸 Prodotti rilevati: ${prodotti.join(', ')}\nInserisci quelli da confermare separati da virgola:`);
+    if(conferma){
+      const arr = conferma.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+      const acqSm = getLS('acquisti_supermercato');
+      setLS('acquisti_supermercato', [...new Set([...acqSm, ...arr])]);
+      aggiornaStatistiche();
+      outputEl.innerText = `📸 Prodotti confermati: ${arr.join(', ')}`;
+    }else{
+      outputEl.innerText = '⚠️ Nessun prodotto confermato.';
+    }
+  }
+
+  /* === INIZIALIZZAZIONE === */
+  caricaListe(); aggiornaPreferiti(); aggiornaStatistiche();
+  </script>
 </body>
 </html>
