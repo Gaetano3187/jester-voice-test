@@ -199,8 +199,10 @@
     setTimeout(() => toast.classList.remove("show"), 2500);
   }
 
-  </script><    // Verifichiamo il supporto al Web Speech API
-    window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+  </sct><    // Verifichiamo il supporto al Web Speech API
+    
+<script>
+  window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition || null;
     if (!window.SpeechRecognition) {
       document.getElementById('voiceStatus').innerText = "Il tuo browser non supporta il riconoscimento vocale.";
     }
