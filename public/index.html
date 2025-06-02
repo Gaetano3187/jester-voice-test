@@ -191,18 +191,16 @@
 <!-- Toast di conferma -->
 <div id="toast"></div>
 
-    // Mostra un messaggio di conferma animato
+   
+    
+<script>
+  
+    
+  // Mostra un messaggio di conferma animato
   function showToast(msg = "Operazione completata!") {
     const toast = document.getElementById("toast");
     toast.textContent = msg;
-    toast.classList.add("show");
-    setTimeout(() => toast.classList.remove("show"), 2500);
-  }
-
-  </sct><    // Verifichiamo il supporto al Web Speech API
-    
-<script>
-  window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+    tdow.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition || null;
     if (!window.SpeechRecognition) {
       document.getElementById('voiceStatus').innerText = "Il tuo browser non supporta il riconoscimento vocale.";
     }
