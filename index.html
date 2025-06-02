@@ -426,9 +426,16 @@
 
   
       // Toast per aggiunta manuale preferiti
-  const addPrefBtn = document.getElementById('addPreferitoBtn');
+
   if (addPrefBtn) {
     addPrefBtn.addEventListener('click', () => showToast('Prodotto aggiunto! ✅'));
+      // Fallback: toast per qualunque pulsante “+”
+  document.addEventListener('click', function(e) {
+    if (e.target && e.target.textContent && e.target.textContent.trim() === '+') {
+      showToast('Prodotto aggiunto! \u2705');
+    }
+  });
+
   }
 // All’avvio, mostro lista vuota
     renderLocalList();
