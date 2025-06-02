@@ -199,8 +199,11 @@
   // Mostra un messaggio di conferma animato
   function showToast(msg = "Operazione completata!") {
     const toast = document.getElementById("toast");
-    toast.textContent = msg;
-    tdow.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+    toast.textContent = msg
+        toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2500);;
+    }
+    window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition || null;
     if (!window.SpeechRecognition) {
       document.getElementById('voiceStatus').innerText = "Il tuo browser non supporta il riconoscimento vocale.";
     }
