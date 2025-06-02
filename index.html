@@ -424,7 +424,13 @@
       renderLocalList();
     }
 
-    // All’avvio, mostro lista vuota
+  
+      // Toast per aggiunta manuale preferiti
+  const addPrefBtn = document.getElementById('addPreferitoBtn');
+  if (addPrefBtn) {
+    addPrefBtn.addEventListener('click', () => showToast('Prodotto aggiunto! ✅'));
+  }
+// All’avvio, mostro lista vuota
     renderLocalList();
   </script>
 </body>
