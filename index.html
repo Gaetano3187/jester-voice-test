@@ -305,6 +305,14 @@
           prodotto: prodotto,
           lista: lista
         };
+        else if (text.includes('apri assistente')) {
+            openChatAssist();
+            return;
+        }
+        else if (text.includes('scansiona scontrino')) {
+            document.getElementById('scan-receipt-btn')?.click();
+            return;
+        }
       }
       else {
         // Non ho riconosciuto alcun pattern valido
@@ -465,7 +473,14 @@
 
   }
 // All’avvio, mostro lista vuota
-    renderLocalList();
+renderLocalList();
+document.body.insertAdjacentHTML('beforeend', '<button id="scan-receipt-btn" style="display:none;"></button>');
+function openChatAssist() {
+    // Placeholder: apri overlay ChatGPT Operator
+    const url = 'https://jester-voice-test.vercel.app/chat-assist';
+    window.open(url, '_blank');
+}
+();
   </script>
 </body>
 </html>
