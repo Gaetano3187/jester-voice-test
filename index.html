@@ -431,9 +431,17 @@
     addPrefBtn.addEventListener('click', () => showToast('Prodotto aggiunto! ✅'));
       // Fallback: toast per qualunque pulsante “+”
   document.addEventListener('click', function(e) {
-    if (e.target && e.target.textContent && e.target.textContent.trim() === '+') {
+    e.target.closest('[data-toast="add"]') {
       showToast('Prodotto aggiunto! \u2705');
-    }
+   
+        // Imposta automaticamente data-toast="add" su tutti i pulsanti con icona "+"
+    document.querySelectorAll('button').forEach(btn => {
+      const txt = btn.textContent.trim();
+      if (txt === '+' || txt.includes('\u2795')) {
+        btn.setAttribute('data-toast', 'add');
+      }
+    });
+}
   });
 
   }
