@@ -3,245 +3,394 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jester – Assistente Vocale</title>
-
+  <title>Jester – Modulo Vocale (Demo)</title>
   <style>
-    :root{
-      --green:#4CAF50;
-      --light:#f4f4f4;
-      --white:#fff;
-      --gray:#ddd;
-      --shadow:rgba(0,0,0,.1);
+    :root {
+      --green: #4CAF50;
+      --red:   #e53935;
+      --light: #f4f4f4;
+      --white: #fff;
+      --gray:  #ddd;
+      --shadow: rgba(0,0,0,0.1);
     }
-    *{box-sizing:border-box;}
-    body{font-family:'Segoe UI',sans-serif;margin:0;background:var(--light);color:#333;}
-
-    /* ---------- HEADER ---------- */
-    header{background:var(--green);color:#fff;padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;}
-    header h1{font-size:1.2rem;margin:0;}
-    header nav button{background:none;border:none;color:#fff;font-size:1.6rem;cursor:pointer;}
-
-    /* ---------- NAV-MENU ---------- */
-    .nav-menu{position:fixed;top:0;left:-240px;width:220px;height:100%;background:var(--white);box-shadow:2px 0 5px var(--shadow);padding:1rem;transition:left .3s;}
-    .nav-menu.open{left:0;}
-    .nav-menu h2{font-size:1rem;margin-top:0;}
-    .nav-menu ul{list-style:none;padding:0;margin:0;}
-    .nav-menu li{margin:.5rem 0;}
-    .nav-menu a{text-decoration:none;color:#333;font-weight:bold;}
-
-    /* ---------- MAIN & CARDS ---------- */
-    main{padding:1rem;max-width:800px;margin:auto;}
-    section{margin-bottom:2rem;}
-    .card{background:var(--white);border-radius:10px;box-shadow:0 0 10px var(--shadow);padding:1rem;margin:1rem 0;}
-    .buttons{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin:1rem 0;}
-    button{padding:.8rem 1.2rem;border:none;border-radius:8px;background:var(--green);color:#fff;font-size:1rem;cursor:pointer;transition:.2s;}
-    button:hover{background:#45a049;}
-
-    #output{white-space:pre-line;font-family:monospace;background:var(--white);padding:1rem;border-radius:8px;box-shadow:0 0 5px var(--shadow);}
-
-    @media(max-width:600px){
-      .buttons{flex-direction:column;align-items:stretch;}
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      background: var(--light);
+      color: #333;
+    }
+    header {
+      background: var(--green);
+      color: #fff;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header h1 {
+      font-size: 1.2rem;
+      margin: 0;
+    }
+    header button {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.6rem;
+      cursor: pointer;
+    }
+    main {
+      padding: 1rem;
+      max-width: 800px;
+      margin: auto;
+    }
+    .card {
+      background: var(--white);
+      border-radius: 10px;
+      box-shadow: 0 0 10px var(--shadow);
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    /* Banner di conferma (inizialmente nascosto) */
+    #confirmBanner {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--white);
+      border: 1px solid var(--gray);
+      box-shadow: 0 0 5px var(--shadow);
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      display: none;
+      z-index: 1000;
+    }
+    #confirmBanner p {
+      margin: 0 0 0.5rem 0;
+    }
+    #confirmBanner button {
+      margin-right: 0.5rem;
+      padding: 0.5rem 0.8rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    #confirmYes {
+      background: var(--green);
+      color: #fff;
+    }
+    #confirmNo {
+      background: var(--red);
+      color: #fff;
+    }
+    /* Lista fittizia di “Supermercato” */
+    #lista-supermercato {
+      list-style: none;
+      padding: 0;
+      margin: 0.5rem 0 0;
+    }
+    #lista-supermercato li {
+      padding: 0.5rem;
+      border-bottom: 1px solid var(--gray);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #lista-supermercato li:last-child {
+      border-bottom: none;
+    }
+    #lista-supermercato .remove-btn {
+      background: transparent;
+      border: none;
+      color: var(--red);
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    /* Stato microfono */
+    #voiceStatus {
+      font-size: 0.9rem;
     }
   </style>
 </head>
 <body>
-
-  <!-- ===== HEADER ===== -->
   <header>
-    <h1>🎤 Jester</h1>
-    <nav>
-      <button id="menuToggle">☰</button>
-    </nav>
+    <h1>🎤 Jester (Demo Vocale)</h1>
+    <button id="voiceToggle">🎙️</button>
   </header>
 
-  <!-- ===== SIDE MENU ===== -->
-  <aside id="navMenu" class="nav-menu">
-    <h2>📂 Menu</h2>
-    <ul>
-      <li><a href="#home"        onclick="closeMenu()">🏠 Home</a></li>
-      <li><a href="#liste"       onclick="closeMenu()">🛒 Liste</a></li>
-      <li><a href="#acquisti"    onclick="closeMenu()">✅ Acquisti</a></li>
-      <li><a href="#preferiti"   onclick="closeMenu()">🌟 Preferiti</a></li>
-      <li><a href="#statistiche" onclick="closeMenu()">📊 Statistiche</a></li>
-      <li><a href="#impostazioni"onclick="closeMenu()">⚙️ Impostazioni</a></li>
-    </ul>
-  </aside>
-
-  <!-- ===== MAIN ===== -->
   <main>
-    <!-- HOME -->
-    <section id="home" class="card">
-      <h2>🏠 Home</h2>
-      <p>Benvenuto in Jester, il tuo assistente vocale personale per la spesa e il controllo delle scorte. Usa i comandi vocali o i pulsanti per iniziare.</p>
+    <!-- Sezione di riepilogo lista Supermercato (fittizia) -->
+    <section class="card">
+      <h2>🛒 Lista Supermercato</h2>
+      <ul id="lista-supermercato">
+        <li>(vuota)</li>
+      </ul>
     </section>
 
-    <!-- LISTE -->
-    <section id="liste" class="card">
-      <h2>🛒 Liste</h2>
-      <div class="buttons">
-        <button onclick="preparaSpesa()">🧺 Prepara Spesa</button>
-        <button onclick="document.getElementById('cameraInput').click()">📷 Scatta Foto (Scontrino)</button>
-      </div>
-
-      <h3>Lista Supermercato</h3>
-      <ul id="lista-supermercato"></ul>
-
-      <h3>Lista Online</h3>
-      <ul id="lista-online"></ul>
-
-      <!-- input nascosto per foto -->
-      <input id="cameraInput" type="file" accept="image/*" capture="environment" style="display:none" onchange="handlePhotoUpload(event)">
+    <!-- Status microfono e messaggi di debug -->
+    <section class="card">
+      <h2>📢 Stato Microfono & Comandi</h2>
+      <p id="voiceStatus">Microfono inattivo</p>
+      <p id="debugText"></p>
     </section>
-
-    <!-- ACQUISTI -->
-    <section id="acquisti" class="card">
-      <h2>✅ Acquisti</h2>
-      <p>I prodotti già acquistati saranno spuntati automaticamente o possono essere segnati manualmente.</p>
-    </section>
-
-    <!-- PREFERITI -->
-    <section id="preferiti" class="card">
-      <h2>🌟 Preferiti</h2>
-      <form onsubmit="aggiungiPreferito(event)">
-        <label for="nome-preferito">Nome prodotto:</label><br>
-        <input id="nome-preferito" type="text" required style="margin:.5rem 0;padding:.3rem;max-width:300px;width:100%;">
-        <button type="submit">➕ Aggiungi ai preferiti</button>
-      </form>
-      <ul id="lista-preferiti"></ul>
-    </section>
-
-    <!-- STATISTICHE -->
-    <section id="statistiche" class="card">
-      <h2>📊 Statistiche</h2>
-      <div id="stats-output" style="font-family:monospace;"></div>
-      <div style="margin-top:1rem;">
-        <label>Completamento della lista:</label>
-        <div style="background:#eee;border-radius:8px;overflow:hidden;max-width:400px;width:100%;">
-          <div id="progress-bar" style="height:20px;background:#4CAF50;width:0%;transition:width .5s;"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- IMPOSTAZIONI -->
-    <section id="impostazioni" class="card">
-      <h2>⚙️ Impostazioni</h2>
-      <p>Personalizza Jester: gestisci il budget, ripristina dati o modifica le preferenze vocali.</p>
-    </section>
-
-    <!-- OUTPUT -->
-    <div id="output" class="card">📝 Output vocale e messaggi appariranno qui...</div>
   </main>
 
-  <!-- ===== SCRIPT ===== -->
+  <!-- Banner di conferma per Aggiungi/Rimuovi -->
+  <div id="confirmBanner">
+    <p id="confirmMessage">[Messaggio di conferma]</p>
+    <button id="confirmYes">Sì</button>
+    <button id="confirmNo">No</button>
+  </div>
+
+  <!-- Script JavaScript -->
   <script>
-  /* === VARIABILI GLOBALI === */
-  const utenteAttivo = 'default';
-  const navMenu      = document.getElementById('navMenu');
-  const outputEl     = document.getElementById('output');
-
-  /* === LISTE === */
-  const ulSupermercato = document.getElementById('lista-supermercato');
-  const ulOnline       = document.getElementById('lista-online');
-
-  /* === PREFERITI === */
-  let preferiti = getLS('preferiti');
-  const listaPreferiti = document.getElementById('lista-preferiti');
-
-  /* === FUNZIONI UTILI === */
-  function getLS(key, def = []) { return JSON.parse(localStorage.getItem(`jester_${utenteAttivo}_${key}`)) || def; }
-  function setLS(key, val)     { localStorage.setItem(`jester_${utenteAttivo}_${key}`, JSON.stringify(val)); }
-
-  /* === MENU === */
-  document.getElementById('menuToggle').addEventListener('click', () => navMenu.classList.toggle('open'));
-  function closeMenu(){ navMenu.classList.remove('open'); }
-
-  /* === LISTE === */
-  function caricaListe(){
-    const sm = getLS('supermercato');
-    const on = getLS('online');
-    ulSupermercato.innerHTML = sm.map((p,i)=>`<li>${p} <button onclick="rimuoviElementoLista('supermercato',${i})">❌</button></li>`).join('');
-    ulOnline.innerHTML       = on.map((p,i)=>`<li>${p} <button onclick="rimuoviElementoLista('online',${i})">❌</button></li>`).join('');
-  }
-  function rimuoviElementoLista(tipo, idx){
-    const lista = getLS(tipo);
-    lista.splice(idx,1);
-    setLS(tipo, lista);
-    caricaListe(); aggiornaStatistiche();
-  }
-
-  /* === PREFERITI === */
-  function aggiornaPreferiti(){
-    listaPreferiti.innerHTML = preferiti.map((p,i)=>`<li>${p} <button onclick="rimuoviPreferito(${i})">❌</button></li>`).join('');
-  }
-  function aggiungiPreferito(e){
-    e.preventDefault();
-    const val = document.getElementById('nome-preferito').value.trim();
-    if(val && !preferiti.includes(val)){
-      preferiti.push(val);
-      setLS('preferiti', preferiti);
-      aggiornaPreferiti();
+    // Verifichiamo il supporto al Web Speech API
+    window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+    if (!window.SpeechRecognition) {
+      document.getElementById('voiceStatus').innerText = "Il tuo browser non supporta il riconoscimento vocale.";
     }
-    e.target.reset();
-  }
-  function rimuoviPreferito(i){
-    preferiti.splice(i,1);
-    setLS('preferiti', preferiti);
-    aggiornaPreferiti();
-  }
 
-  /* === STATISTICHE === */
-  function aggiornaStatistiche(){
-    const sm  = getLS('supermercato');
-    const on  = getLS('online');
-    const acqSm = getLS('acquisti_supermercato');
-    const acqOn = getLS('acquisti_online');
-    const tot   = sm.length + on.length + acqSm.length + acqOn.length || 1;
-    const perc  = Math.round(((acqSm.length + acqOn.length)/tot)*100);
+    // Stato globale
+    let recognizing = false;
+    let currentIntent = null;   // { type: "Aggiungi"|"Rimuovi", prodotto: string, quantita: number, unita: string, lista: "supermercato"|"online" }
+    let recognition;            // oggetto SpeechRecognition
 
-    document.getElementById('stats-output').innerText =
-`Totale in lista supermercato: ${sm.length}
-Totale in lista online:        ${on.length}
-Acquistati supermercato:       ${acqSm.length}
-Acquistati online:             ${acqOn.length}
-Prodotti totali acquistati:    ${acqSm.length + acqOn.length}
-Percentuale lista completata:  ${perc}%`;
+    // Riferimenti a elementi DOM
+    const voiceToggle    = document.getElementById('voiceToggle');
+    const voiceStatus    = document.getElementById('voiceStatus');
+    const debugText      = document.getElementById('debugText');
+    const confirmBanner  = document.getElementById('confirmBanner');
+    const confirmMessage = document.getElementById('confirmMessage');
+    const confirmYes     = document.getElementById('confirmYes');
+    const confirmNo      = document.getElementById('confirmNo');
+    const listaSuper     = document.getElementById('lista-supermercato');
 
-    const bar = document.getElementById('progress-bar');
-    bar.style.width = perc + '%';
-    bar.style.background = perc < 33 ? '#e53935' : perc < 66 ? '#fbc02d' : '#4CAF50';
-  }
+    // Inizializzazione di SpeechRecognition
+    if (window.SpeechRecognition) {
+      recognition = new window.SpeechRecognition();
+      recognition.lang = 'it-IT';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
 
-  /* === PREPARA SPESA === */
-  function preparaSpesa(){
-    const nuovaSm = getLS('supermercato').filter(p=>!getLS('acquisti_supermercato').includes(p));
-    const nuovaOn = getLS('online').filter(p=>!getLS('acquisti_online').includes(p));
-    setLS('supermercato', nuovaSm);
-    setLS('online', nuovaOn);
-    caricaListe(); aggiornaStatistiche();
-    outputEl.innerText = '🧺 Spesa aggiornata: rimossi i prodotti già acquistati.';
-  }
+      recognition.addEventListener('start', () => {
+        recognizing = true;
+        voiceStatus.innerText = "🎧 Ascoltando...";
+        debugText.innerText = "";
+      });
 
-  /* === OCR SCONTRINO (SIMULATO) === */
-  function handlePhotoUpload(e){
-    const file = e.target.files[0];
-    if(!file){ return; }
+      recognition.addEventListener('end', () => {
+        recognizing = false;
+        voiceStatus.innerText = "Microfono inattivo";
+      });
 
-    // Simulazione OCR
-    const prodotti = ['latte','uova','caffe'];
-    const conferma = prompt(`📸 Prodotti rilevati: ${prodotti.join(', ')}\nInserisci quelli da confermare separati da virgola:`);
-    if(conferma){
-      const arr = conferma.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
-      const acqSm = getLS('acquisti_supermercato');
-      setLS('acquisti_supermercato', [...new Set([...acqSm, ...arr])]);
-      aggiornaStatistiche();
-      outputEl.innerText = `📸 Prodotti confermati: ${arr.join(', ')}`;
-    }else{
-      outputEl.innerText = '⚠️ Nessun prodotto confermato.';
+      recognition.addEventListener('error', (e) => {
+        recognizing = false;
+        voiceStatus.innerText = "Errore di riconoscimento: " + e.error;
+      });
+
+      recognition.addEventListener('result', (event) => {
+        const transcript = event.results[0][0].transcript.trim();
+        debugText.innerText = `➡️ Hai detto: "${transcript}"`;
+        parseIntent(transcript.toLowerCase());
+      });
     }
-  }
 
-  /* === INIZIALIZZAZIONE === */
-  caricaListe(); aggiornaPreferiti(); aggiornaStatistiche();
+    // Avvia/ferma il riconoscimento quando si clicca il pulsante 🎙️
+    voiceToggle.addEventListener('click', () => {
+      if (!window.SpeechRecognition) return;
+
+      if (recognizing) {
+        recognition.stop();
+        return;
+      }
+      recognition.start();
+    });
+
+    // Funzione di parsing intent (molto basica, con regex)
+    function parseIntent(text) {
+      // Reset dell’intent corrente
+      currentIntent = null;
+
+      // Pattern “Aggiungi [quantità] [unità]? [prodotto] alla lista del (supermercato|online)”
+      const aggiungiPattern = /aggiungi\s+(\d+)?\s*(litri?|litro|pezzi?|pz|kg|grammi?|g)?\s*([a-zàèéìòù ]+?)\s+alla\s+lista(?:\s+del)?\s+(supermercato|online)/;
+      // Pattern “Togli|Rimuovi [prodotto] dalla lista (supermercato|online)”
+      const rimuoviPattern = /(togli|rimuovi)\s+([a-zàèéìòù ]+?)\s+dalla\s+lista(?:\s+del)?\s+(supermercato|online)/;
+
+      let m;
+      if ((m = aggiungiPattern.exec(text))) {
+        // Estraggo quantità (opzionale) e unità (opzionale)
+        const rawQty = m[1];
+        const rawUn = m[2];
+        let quantita = 1;
+        let unita = "";
+
+        if (rawQty) {
+          quantita = parseInt(rawQty, 10);
+        }
+        if (rawUn) {
+          unita = rawUn;
+        }
+
+        const prodotto = m[3].trim();
+        const lista    = m[4];
+
+        currentIntent = {
+          type: "Aggiungi",
+          prodotto: prodotto,
+          quantita: quantita,
+          unita: unita,
+          lista: lista
+        };
+      }
+      else if ((m = rimuoviPattern.exec(text))) {
+        const prodotto = m[2].trim();
+        const lista    = m[3];
+        currentIntent = {
+          type: "Rimuovi",
+          prodotto: prodotto,
+          lista: lista
+        };
+      }
+      else {
+        // Non ho riconosciuto alcun pattern valido
+        speakText("Non ho capito. Puoi ripetere?");
+        return;
+      }
+
+      // Se siamo arrivati qui, abbiamo un intent valido: chiediamo conferma
+      askForConfirmation();
+    }
+
+    // Mostra banner di conferma
+    function askForConfirmation() {
+      if (!currentIntent) return;
+
+      let msg = "";
+      if (currentIntent.type === "Aggiungi") {
+        msg = `Hai chiesto di aggiungere ${currentIntent.quantita} ${currentIntent.unita || ""} ${currentIntent.prodotto} alla lista ${currentIntent.lista}. Confermi?`;
+      }
+      else if (currentIntent.type === "Rimuovi") {
+        msg = `Hai chiesto di rimuovere ${currentIntent.prodotto} dalla lista ${currentIntent.lista}. Confermi?`;
+      }
+      confirmMessage.innerText = msg;
+      confirmBanner.style.display = "block";
+
+      // Mantenere la lettura vocale del messaggio di conferma
+      speakText(msg);
+    }
+
+    // Se l’utente clicca “Sì”
+    confirmYes.addEventListener('click', () => {
+      confirmBanner.style.display = "none";
+      executeIntent();
+    });
+
+    // Se l’utente clicca “No”
+    confirmNo.addEventListener('click', () => {
+      confirmBanner.style.display = "none";
+      speakText("Operazione annullata.");
+      currentIntent = null;
+    });
+
+    // Esegue l’intent confermato (fittizio – qui simulo le chiamate API)
+    function executeIntent() {
+      if (!currentIntent) return;
+
+      if (currentIntent.type === "Aggiungi") {
+        // Simulo una POST a /api/lista/aggiungi
+        const payload = {
+          userId: "UTENTE_DEMO",
+          lista: currentIntent.lista,
+          prodotti: [
+            {
+              nome: currentIntent.prodotto,
+              quantita: currentIntent.quantita,
+              unita: currentIntent.unita
+            }
+          ],
+          timestamp: new Date().toISOString()
+        };
+        debugText.innerText = "📡 [Simulazione] Chiamata API /api/lista/aggiungi\n" + JSON.stringify(payload, null, 2);
+
+        // Aggiorno localmente la lista “Supermercato” solo per demo
+        if (currentIntent.lista === "supermercato") {
+          addToLocalList(currentIntent.prodotto, currentIntent.quantita, currentIntent.unita);
+          speakText(`Ho aggiunto ${currentIntent.quantita} ${currentIntent.unita || ""} ${currentIntent.prodotto} alla lista del supermercato.`);
+        } else {
+          speakText(`(Demo) Aggiungo ${currentIntent.prodotto} alla lista online.`);
+        }
+      }
+      else if (currentIntent.type === "Rimuovi") {
+        // Simulo una POST a /api/lista/rimuovi
+        const payload = {
+          userId: "UTENTE_DEMO",
+          lista: currentIntent.lista,
+          prodotto: currentIntent.prodotto,
+          timestamp: new Date().toISOString()
+        };
+        debugText.innerText = "📡 [Simulazione] Chiamata API /api/lista/rimuovi\n" + JSON.stringify(payload, null, 2);
+
+        // Rimuovo da lista locale se esiste
+        if (currentIntent.lista === "supermercato") {
+          removeFromLocalList(currentIntent.prodotto);
+          speakText(`Ho rimosso ${currentIntent.prodotto} dalla lista del supermercato.`);
+        } else {
+          speakText(`(Demo) Rimuovo ${currentIntent.prodotto} dalla lista online.`);
+        }
+      }
+
+      currentIntent = null;
+    }
+
+    // Funzione di sintesi vocale (Text-to-Speech)
+    function speakText(text) {
+      if (!window.speechSynthesis) return;
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'it-IT';
+      window.speechSynthesis.speak(utter);
+    }
+
+    // Gestione lista “Supermercato” in locale (solo per demo)
+    let localSuperList = []; // array di nomi di prodotto
+    function renderLocalList() {
+      listaSuper.innerHTML = "";
+      if (localSuperList.length === 0) {
+        listaSuper.innerHTML = "<li>(vuota)</li>";
+        return;
+      }
+      localSuperList.forEach((item, idx) => {
+        const li = document.createElement('li');
+        li.innerText = item;
+        const btn = document.createElement('button');
+        btn.className = "remove-btn";
+        btn.innerText = "❌";
+        btn.onclick = () => {
+          localSuperList.splice(idx, 1);
+          renderLocalList();
+        };
+        li.appendChild(btn);
+        listaSuper.appendChild(li);
+      });
+    }
+    function addToLocalList(nome, quantita, unita) {
+      const label = quantita > 1
+                    ? `${quantita} ${unita || ""} ${nome}`
+                    : nome;
+      localSuperList.push(label);
+      renderLocalList();
+    }
+    function removeFromLocalList(nome) {
+      // Rimuovo la prima occorrenza che contiene la stringa “nome”
+      const idx = localSuperList.findIndex(item => item.includes(nome));
+      if (idx !== -1) {
+        localSuperList.splice(idx, 1);
+      }
+      renderLocalList();
+    }
+
+    // All’avvio, mostro lista vuota
+    renderLocalList();
   </script>
 </body>
 </html>
