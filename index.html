@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jester - Test Vocale</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 2rem;
+      background-color: #f4f4f4;
+    }
+    #output {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: white;
+      border-radius: 8px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    button {
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      cursor: pointer;
+      border: none;
+      background-color: #4CAF50;
+      color: white;
+      border-radius: 8px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎙️ Jester - Assistente Vocale</h1>
+  <p>Clicca sul pulsante e parla: ad esempio "aggiungi latte alla lista della spesa"</p>
+  <button onclick="startRecognition()">Inizia a Parlare</button>
+
+  <div id="output">📝 Output vocale apparirà qui...</div>
+
+  <script>
+    const output = document.getElementById('output');
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      output.innerText = '❌ Il tuo browser non supporta il riconoscimento vocale.';
+    }
+
+    function startRecognition() {
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'it-IT';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.start();
+      output.innerText = '🎙️ Ascolto in corso...';
+
+      recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        output.innerText = '✅ Hai detto: "' + transcript + '"';
+
+        // Simulazione logica (da sostituire con backend/funzione reale)
+        if (transcript.toLowerCase().includes("latte")) {
+          output.innerText += '\n📦 Latte aggiunto alla lista del supermercato';
+        } else if (transcript.toLowerCase().includes("pane")) {
+          output.innerText += '\n📦 Pane aggiunto alla lista online';
+        } else {
+          output.innerText += '\nℹ️ Nessuna azione riconosciuta';
+        }
+      };
+
+      recognition.onerror = function(event) {
+        output.innerText = '❌ Errore nel riconoscimento: ' + event.error;
+      };
+    }
+  </script>
+</body>
+</html>
