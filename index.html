@@ -38,54 +38,34 @@
       font-size: 1.5rem;
       cursor: pointer;
     }
+    /* MENU LATERALE */
     .nav-menu {
       position: fixed;
       top: 0;
-      left: -250px;
-      width: 220px;
+      left: -260px;
+      width: 240px;
       height: 100%;
       background-color: var(--white);
       box-shadow: 2px 0 5px var(--shadow);
       padding: 1rem;
       transition: left 0.3s ease;
+      overflow-y: auto;
     }
-    .nav-menu.open {
-      left: 0;
-    }
-    .nav-menu h2 {
-      font-size: 1rem;
-      margin-top: 0;
-    }
-    .nav-menu ul {
-      list-style: none;
-      padding: 0;
-    }
-    .nav-menu ul li {
-      margin: 0.5rem 0;
-    }
-    .nav-menu ul li a {
-      text-decoration: none;
-      color: #333;
-      font-weight: bold;
-    }
-    main {
-      padding: 1rem;
-      max-width: 800px;
-      margin: auto;
-    }
+    .nav-menu.open { left: 0; }
+    .nav-menu h2 { font-size: 1rem; margin-top: 0; }
+    .nav-menu details { margin: 0.5rem 0; }
+    .nav-menu summary { cursor: pointer; font-weight: bold; }
+    .nav-menu a { text-decoration: none; color: #333; display: block; padding: 0.2rem 0 0.2rem 1rem; }
+
+    /* PRINCIPALE */
+    main { padding: 1rem; max-width: 900px; margin: auto; }
+    section { margin-bottom: 2rem; }
     .card {
       background: var(--white);
       border-radius: 10px;
       box-shadow: 0 0 10px var(--shadow);
-      margin: 1rem 0;
       padding: 1rem;
-    }
-    .buttons {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
+      margin: 1rem 0;
     }
     button {
       padding: 0.8rem 1.2rem;
@@ -97,117 +77,179 @@
       cursor: pointer;
       transition: 0.2s;
     }
-    button:hover {
-      background-color: #45a049;
-    }
-    #output {
-      white-space: pre-line;
-      font-family: monospace;
+    button:hover { background-color: #45a049; }
+
+    /* VOICE DISPLAY */
+    .voice-display {
       background: var(--white);
-      padding: 1rem;
       border-radius: 8px;
-      margin-top: 1rem;
+      padding: 0.8rem;
+      margin-top: 0.5rem;
       box-shadow: 0 0 5px var(--shadow);
+      font-family: monospace;
     }
+
+    #output { white-space: pre-line; font-family: monospace; }
+
     @media (max-width: 600px) {
-      .buttons {
-        flex-direction: column;
-        align-items: stretch;
-      }
+      .nav-menu { width: 80%; }
     }
   </style>
 </head>
 <body>
   <header>
-  <h1>🎤 Jester</h1>
-  <nav>
-    <button onclick="document.querySelector('.nav-menu').classList.toggle('open')">☰</button>
-  </nav>
-  
-</header>
+    <h1>🎤 Jester</h1>
+    <nav>
+      <button onclick="document.querySelector('.nav-menu').classList.toggle('open')">☰</button>
+    </nav>
+  </header>
+
+  <!-- MENU LATERALE A TENDINA -->
   <aside class="nav-menu">
     <h2>📂 Menu</h2>
-    <ul>
-$1
-
-</ul>
+    <details open>
+      <summary>🏠 Home</summary>
+      <a href="#voice">🎙️ Comandi Vocali</a>
+    </details>
+    <details>
+      <summary>🛒 Liste</summary>
+      <a href="#liste">📝 Lista Supermercato</a>
+      <a href="#online">💻 Lista Online</a>
+    </details>
+    <details>
+      <summary>✅ Acquisti</summary>
+      <a href="#acquisti">Storico</a>
+    </details>
+    <details>
+      <summary>🌟 Preferiti</summary>
+      <a href="#preferiti">Gestisci Preferiti</a>
+    </details>
+    <details>
+      <summary>📊 Statistiche</summary>
+      <a href="#statistiche">Visualizza Statistiche</a>
+    </details>
+    <details>
+      <summary>⚙️ Impostazioni</summary>
+      <a href="#impostazioni">Preferenze</a>
+    </details>
   </aside>
+
   <main>
-    <section id="home">
-  <h2>🏠 Home</h2>
-  <p>Benvenuto in Jester, il tuo assistente vocale personale per la spesa e il controllo delle scorte. Usa i comandi vocali o i pulsanti per iniziare.</p>
-</section>
-<section id="liste">
-  <h2>🛒 Liste</h2>
-  <p>Gestisci i tuoi acquisti tra supermercato e online.</p>
-  <button onclick="preparaSpesa()" style="margin: 1rem auto; display: block;">🧺 Prepara Spesa</button>
-  <h3>Lista Supermercato</h3>
-  <ul id="lista-supermercato"></ul>
-  <h3>Lista Online</h3>
-  <ul id="lista-online"></ul>
-</section>
-    
-    <button onclick="preparaSpesa()" style="margin: 1rem auto; display: block;">🧺 Prepara Spesa</button>
-    <h3>Lista Online</h3>
-    <ul id="lista-online"></ul>
-  </div>
-</section>
-    <section id="acquisti">
-  <h2>✅ Acquisti</h2>
-  <p>Prodotti già acquistati saranno spuntati automaticamente o possono essere segnati manualmente tramite il comando dedicato.</p>
-</section>
-    <section id="preferiti">
-  <h2>🌟 Preferiti</h2>
-  <p>Registra qui i tuoi prodotti preferiti, come un vino, un formaggio o un piatto speciale. Saranno suggeriti automaticamente per futuri acquisti.</p>
-  <form onsubmit="aggiungiPreferito(event)" style="margin-top:1rem;">
-    <label for="nome-preferito">Nome prodotto:</label>
-    <input id="nome-preferito" type="text" required style="margin: 0.5rem 0; padding: 0.3rem; width: 100%; max-width: 300px;">
-    <button type="submit">➕ Aggiungi ai preferiti</button>
-  </form>
-  <ul id="lista-preferiti"></ul>
-</section>
-    <section id="statistiche">
-  <h2>📊 Statistiche</h2>
-  <p>Analisi dei tuoi acquisti e abitudini di spesa.</p>
-  <div id="stats-output" style="margin-top: 1rem; background: #fff; padding: 1rem; border-radius: 8px; box-shadow: 0 0 5px rgba(0,0,0,0.1); font-family: monospace;"></div>
-<div style="margin-top: 1rem;">
-  <label>Completamento della lista:</label>
-  <div style="background:#eee; border-radius:8px; overflow:hidden; width:100%; max-width:400px;">
-    <div id="progress-bar" style="height:20px; background:#4CAF50; width:0%; transition:width 0.5s;"></div>
-  </div>
-</div>
-</section>
-    <section id="impostazioni">
-  <h2>⚙️ Impostazioni</h2>
-  <p>Personalizza Jester: gestisci il budget, ripristina dati, o modifica le tue preferenze vocali.</p>
-</section>
-    $1
-  <button onclick="document.getElementById('cameraInput').click()">📷 Scatta Foto (Scontrino)</button>
-  <input type="file" accept="image/*" capture="environment" id="cameraInput" style="display:none" onchange="handlePhotoUpload(event)">
-</div>
-    <div id="output">📝 Output vocale e messaggi appariranno qui...</div>
+    <!-- SEZIONE VOCALE -->
+    <section id="voice" class="card">
+      <h2>🎙️ Comando Vocale</h2>
+      <div id="voice-command" class="voice-display">Nessun comando rilevato...</div>
+    </section>
+
+    <!-- LISTA SUPERMERCATO (schermata principale) -->
+    <section id="liste" class="card">
+      <h2>🛒 Lista Supermercato</h2>
+      <form onsubmit="aggiungiSupermercato(event)" style="margin:0.5rem 0;">
+        <label for="nome-supermercato">Aggiungi prodotto:</label>
+        <input id="nome-supermercato" type="text" required style="margin:0 0.5rem; padding:0.3rem;">
+        <button type="submit">➕ Aggiungi</button>
+      </form>
+      <ul id="lista-supermercato"></ul>
+      <button onclick="preparaSpesa()" style="margin-top:1rem;">🧺 Prepara Spesa</button>
+    </section>
+
+    <!-- LISTA ONLINE (secondaria) -->
+    <section id="online" class="card">
+      <h2>💻 Lista Online</h2>
+      <ul id="lista-online"></ul>
+    </section>
+
+    <!-- PREFERITI -->
+    <section id="preferiti" class="card">
+      <h2>🌟 Preferiti</h2>
+      <form onsubmit="aggiungiPreferito(event)" style="margin-top:1rem;">
+        <label for="nome-preferito">Nome prodotto:</label>
+        <input id="nome-preferito" type="text" required style="margin: 0.5rem 0; padding: 0.3rem; width: 100%; max-width: 300px;">
+        <button type="submit">➕ Aggiungi ai preferiti</button>
+      </form>
+      <ul id="lista-preferiti"></ul>
+    </section>
+
+    <!-- STATISTICHE -->
+    <section id="statistiche" class="card">
+      <h2>📊 Statistiche</h2>
+      <div id="stats-output" style="margin-top: 1rem; font-family: monospace;"></div>
+      <div style="margin-top: 1rem;">
+        <label>Completamento della lista:</label>
+        <div style="background:#eee; border-radius:8px; overflow:hidden; width:100%; max-width:400px;">
+          <div id="progress-bar" style="height:20px; background:#4CAF50; width:0%; transition:width 0.5s;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOTO SCONTRINO -->
+    <section class="card" id="foto">
+      <h2>📸 Scontrino</h2>
+      <button onclick="document.getElementById('cameraInput').click()">📷 Scatta / Carica Foto</button>
+      <input type="file" accept="image/*" capture="environment" id="cameraInput" style="display:none" onchange="handlePhotoUpload(event)">
+    </section>
+
+    <!-- OUTPUT GENERALE -->
+    <section class="card">
+      <div id="output">📝 Output vocale e messaggi appariranno qui...</div>
+    </section>
   </main>
+
 <script>
-// Caricamento lista supermercato e online da localStorage
+// ==== VARIABILI GLOBALI ====
+const utenteAttivo = 'default'; // placeholder, da integrare con login multiutente se necessario
 const ulSupermercato = document.getElementById('lista-supermercato');
 const ulOnline = document.getElementById('lista-online');
 
+// ==== FUNZIONI LISTE ====
 function caricaListe() {
   aggiornaStatistiche();
   const sm = JSON.parse(localStorage.getItem(`jester_${utenteAttivo}_supermercato`)) || [];
   const on = JSON.parse(localStorage.getItem(`jester_${utenteAttivo}_online`)) || [];
-  ulSupermercato.innerHTML = sm.map((item, i) => `<li>${item} <button onclick="rimuoviElementoLista('jester_supermercato', ${i}, 'supermercato')" style="margin-left:10px">❌</button></li>`).join('');
-  ulOnline.innerHTML = on.map((item, i) => `<li>${item} <button onclick="rimuoviElementoLista('jester_online', ${i}, 'online')" style="margin-left:10px">❌</button></li>`).join('');
+  ulSupermercato.innerHTML = sm.map((item, i) => `<li>${item} <button onclick=\"rimuoviElementoLista('jester_${utenteAttivo}_supermercato',${i},'supermercato')\">❌</button></li>`).join('');
+  ulOnline.innerHTML = on.map((item, i) => `<li>${item} <button onclick=\"rimuoviElementoLista('jester_${utenteAttivo}_online',${i},'online')\">❌</button></li>`).join('');
 }
-caricaListe();
 
-// Gestione preferiti
+function aggiungiSupermercato(event) {
+  event.preventDefault();
+  const input = document.getElementById('nome-supermercato');
+  const val = input.value.trim();
+  if (val) {
+    const lista = JSON.parse(localStorage.getItem(`jester_${utenteAttivo}_supermercato`)) || [];
+    lista.push(val);
+    localStorage.setItem(`jester_${utenteAttivo}_supermercato`, JSON.stringify(lista));
+    caricaListe();
+    aggiornaStatistiche();
+  }
+  input.value = '';
+}
+
+function rimuoviElementoLista(storageKey, index, tipo) {
+  let lista = JSON.parse(localStorage.getItem(storageKey)) || [];
+  if (index > -1) {
+    lista.splice(index, 1);
+    localStorage.setItem(storageKey, JSON.stringify(lista));
+    caricaListe();
+    aggiornaStatistiche();
+  }
+}
+
+function preparaSpesa() {
+  const sm = JSON.parse(localStorage.getItem(`jester_${utenteAttivo}_supermercato`)) || [];
+  const acqSm = JSON.parse(localStorage.getItem(`jester_${utenteAttivo}_acquisti_supermercato`)) || [];
+  const nuovaSm = sm.filter(p => !acqSm.includes(p));
+  localStorage.setItem(`jester_${utenteAttivo}_supermercato`, JSON.stringify(nuovaSm));
+  caricaListe();
+  aggiornaStatistiche();
+  document.getElementById('output').innerText = '🧺 Spesa aggiornata: rimossi i prodotti già acquistati.';
+}
+
+// ==== PREFERITI ====
 let preferiti = JSON.parse(localStorage.getItem(`jester_${utenteAttivo}_preferiti`)) || [];
 const listaPreferiti = document.getElementById('lista-preferiti');
-
 function aggiornaPreferiti() {
-  listaPreferiti.innerHTML = preferiti.map((p, i) => `<li>${p} <button onclick="rimuoviPreferito(${i})" style="margin-left:10px">❌</button></li>`).join('');}
-
+  listaPreferiti.innerHTML = preferiti.map((p, i) => `<li>${p} <button onclick="rimuoviPreferito(${i})">❌</button></li>`).join('');
+}
 function aggiungiPreferito(event) {
   event.preventDefault();
   const input = document.getElementById('nome-preferito');
@@ -219,122 +261,65 @@ function aggiungiPreferito(event) {
   }
   input.value = '';
 }
-
-aggiornaPreferiti();
 function rimuoviPreferito(index) {
   if (index > -1) {
     preferiti.splice(index, 1);
-    localStorage.setItem('jester_preferiti', JSON.stringify(preferiti));
+    localStorage.setItem(`jester_${utenteAttivo}_preferiti`, JSON.stringify(preferiti));
     aggiornaPreferiti();
   }
 }
-function rimuoviElementoLista(storageKey, index, tipo) {
-  let lista = JSON.parse(localStorage.getItem(storageKey)) || [];
-  if (index > -1) {
-    lista.splice(index, 1);
-    localStorage.setItem(storageKey, JSON.stringify(lista));
-  aggiornaStatistiche();
-    if (tipo === 'supermercato') caricaListe();
-    if (tipo === 'online') caricaListe();
-  }
-}
 
-// Statistiche semplificate
+// ==== STATISTICHE ====
 function aggiornaStatistiche() {
-  const sm = JSON.parse(localStorage.getItem('jester_supermercato')) || [];
-  const on = JSON.parse(localStorage.getItem('jester_online')) || [];
+  const sm = JSON.parse(localStorage.getItem(`jester_${utenteAttivo}_supermercato`)) || [];
+  const on = JSON.parse(localStorage.getItem(`jester_${utenteAttivo}_online`)) || [];
   const acqSm = JSON.parse(localStorage.getItem(`jester_${utenteAttivo}_acquisti_supermercato`)) || [];
   const acqOn = JSON.parse(localStorage.getItem(`jester_${utenteAttivo}_acquisti_online`)) || [];
   const output = document.getElementById('stats-output');
   const percent = Math.round(((acqSm.length + acqOn.length) / (sm.length + on.length + acqSm.length + acqOn.length)) * 100) || 0;
-  output.innerText = `
-Totale in lista supermercato: ${sm.length}
-Totale in lista online: ${on.length}
-Acquistati supermercato: ${acqSm.length}
-Acquistati online: ${acqOn.length}
-Prodotti totali acquistati: ${acqSm.length + acqOn.length}
-Percentuale lista completata: ${percent}%
-`;
+  output.innerText = `Totale in lista supermercato: ${sm.length}\nTotale in lista online: ${on.length}\nAcquistati supermercato: ${acqSm.length}\nAcquistati online: ${acqOn.length}\nProdotti totali acquistati: ${acqSm.length + acqOn.length}\nPercentuale lista completata: ${percent}%`;
   const bar = document.getElementById('progress-bar');
   bar.style.width = percent + '%';
-  if (percent < 33) {
-    bar.style.background = '#e53935'; // rosso
-  } else if (percent < 66) {
-    bar.style.background = '#fbc02d'; // giallo
-  } else {
-    bar.style.background = '#4CAF50'; // verde
-  }
+  bar.style.background = percent < 33 ? '#e53935' : percent < 66 ? '#fbc02d' : '#4CAF50';
 }
 
-aggiornaStatistiche();
-// Prepara Spesa: rimuove i prodotti acquistati da entrambe le liste
-function preparaSpesa() {
-  const sm = JSON.parse(localStorage.getItem('jester_supermercato')) || [];
-  const on = JSON.parse(localStorage.getItem('jester_online')) || [];
-  const acqSm = JSON.parse(localStorage.getItem('jester_acquisti_supermercato')) || [];
-  const acqOn = JSON.parse(localStorage.getItem('jester_acquisti_online')) || [];
-  const nuovaSm = sm.filter(p => !acqSm.includes(p));
-  const nuovaOn = on.filter(p => !acqOn.includes(p));
-  localStorage.setItem(`jester_${utenteAttivo}_supermercato`, JSON.stringify(nuovaSm));
-  localStorage.setItem(`jester_${utenteAttivo}_online`, JSON.stringify(nuovaOn));
-  caricaListe();
-  aggiornaStatistiche();
-  document.getElementById('output').innerText = '🧺 Spesa aggiornata: rimossi i prodotti già acquistati.';
-}
-);
-  document.querySelector('.nav-menu').classList.remove('open');
-});
-// Gestione foto scontrino
+// ==== FOTO SCONTRINO (simulato) ====
 function handlePhotoUpload(event) {
   const file = event.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      let confermeOCR = JSON.parse(localStorage.getItem('jester_ocr_confirmed')) || [];
-const ocrRisultatoSimulato = confermeOCR.length ? confermeOCR : ['latte', 'uova', 'caffe'];
-let proposta = ocrRisultatoSimulato.filter(p =>
-  ulSupermercato.innerHTML.toLowerCase().includes(p) || ulOnline.innerHTML.toLowerCase().includes(p)
-);
-if (proposta.length > 0) {
-  const confermati = prompt(`📸 Prodotti rilevati: ${proposta.join(', ')}
-Inserisci quelli da confermare separati da virgola:`);
-  if (confermati) {
-    let nuovi = [];
-    const confermatiArray = confermati.split(',').map(x => x.trim().toLowerCase());
-confermatiArray.forEach(p => {
-  if (!acquisti.supermercato.includes(p) && !acquisti.online.includes(p)) {
-    if (ulSupermercato.innerHTML.toLowerCase().includes(p)) {
-      acquisti.supermercato.push(p);
-      nuovi.push(p);
-    } else if (ulOnline.innerHTML.toLowerCase().includes(p)) {
-      acquisti.online.push(p);
-      nuovi.push(p);
-    }
-  }
-});
-// Salva i prodotti confermati per migliorare il riconoscimento
-localStorage.setItem('jester_ocr_confirmed', JSON.stringify([...new Set([...confermeOCR, ...confermatiArray])])) ;
-          nuovi.push(p);
-        } else if (ulOnline.innerHTML.toLowerCase().includes(p)) {
-          acquisti.online.push(p);
-          nuovi.push(p);
-        }
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function() {
+    // Simulazione OCR
+    let confermeOCR = JSON.parse(localStorage.getItem('jester_ocr_confirmed')) || [];
+    const ocrRisultatoSimulato = confermeOCR.length ? confermeOCR : ['latte', 'uova', 'caffe'];
+    const proposta = ocrRisultatoSimulato.filter(p => ulSupermercato.innerHTML.toLowerCase().includes(p));
+    if (proposta.length) {
+      const confermati = prompt(`📸 Prodotti rilevati: ${proposta.join(', ')}\nInserisci quelli da confermare separati da virgola:`);
+      if (confermati) {
+        const confermatiArray = confermati.split(',').map(x => x.trim().toLowerCase());
+        const lista = JSON.parse(localStorage.getItem(`jester_${utenteAttivo}_acquisti_supermercato`)) || [];
+        confermatiArray.forEach(p => { if (!lista.includes(p)) lista.push(p); });
+        localStorage.setItem(`jester_${utenteAttivo}_acquisti_supermercato`, JSON.stringify(lista));
+        localStorage.setItem('jester_ocr_confirmed', JSON.stringify([...new Set([...confermeOCR, ...confermatiArray])])) ;
+        document.getElementById('output').innerText = `📸 Prodotti confermati: ${confermatiArray.join(', ')}`;
+        aggiornaStatistiche();
       }
-    });
-    localStorage.setItem(`jester_${utenteAttivo}_acquisti_supermercato`, JSON.stringify(acquisti.supermercato));
-    localStorage.setItem(`jester_${utenteAttivo}_acquisti_online`, JSON.stringify(acquisti.online));
-    aggiornaStatistiche();
-    document.getElementById('output').innerText = `📸 Prodotti confermati: ${nuovi.join(', ')}`;
-  } else {
-    document.getElementById('output').innerText = '⚠️ Nessun prodotto confermato.';
-  }
-} else {
-  document.getElementById('output').innerText = '❌ Nessun prodotto rilevato nella lista attuale.';
+    } else {
+      document.getElementById('output').innerText = '❌ Nessun prodotto rilevato nella lista attuale.';
+    }
+  };
+  reader.readAsDataURL(file);
 }
-    };
-    reader.readAsDataURL(file);
-  }
+
+// ==== COMANDI VOCALI (placeholder) ====
+function mostraComando(comando) {
+  document.getElementById('voice-command').innerText = comando || 'Nessun comando rilevato...';
 }
+
+// ==== INIT ====
+caricaListe();
+aggiornaPreferiti();
+aggiornaStatistiche();
 </script>
 </body>
 </html>
