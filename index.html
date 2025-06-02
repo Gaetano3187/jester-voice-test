@@ -3,80 +3,313 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jester - Test Vocale</title>
+  <title>Jester - Assistente Vocale</title>
   <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      padding: 2rem;
-      background-color: #f4f4f4;
+    :root {
+      --green: #4CAF50;
+      --light: #f4f4f4;
+      --white: #ffffff;
+      --gray: #ddd;
+      --shadow: rgba(0, 0, 0, 0.1);
     }
-    #output {
-      margin-top: 2rem;
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--light);
+      color: #333;
+    }
+    header {
+      background-color: var(--green);
+      color: white;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header h1 {
+      font-size: 1.2rem;
+      margin: 0;
+    }
+    nav button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    .nav-menu {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 220px;
+      height: 100%;
+      background-color: var(--white);
+      box-shadow: 2px 0 5px var(--shadow);
       padding: 1rem;
-      background: white;
-      border-radius: 8px;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      transition: left 0.3s ease;
+    }
+    .nav-menu.open {
+      left: 0;
+    }
+    .nav-menu h2 {
+      font-size: 1rem;
+      margin-top: 0;
+    }
+    .nav-menu ul {
+      list-style: none;
+      padding: 0;
+    }
+    .nav-menu ul li {
+      margin: 0.5rem 0;
+    }
+    .nav-menu ul li a {
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+    }
+    main {
+      padding: 1rem;
+      max-width: 800px;
+      margin: auto;
+    }
+    .card {
+      background: var(--white);
+      border-radius: 10px;
+      box-shadow: 0 0 10px var(--shadow);
+      margin: 1rem 0;
+      padding: 1rem;
+    }
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
     }
     button {
-      padding: 1rem 2rem;
-      font-size: 1.2rem;
-      cursor: pointer;
+      padding: 0.8rem 1.2rem;
       border: none;
-      background-color: #4CAF50;
-      color: white;
       border-radius: 8px;
+      background-color: var(--green);
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.2s;
     }
     button:hover {
       background-color: #45a049;
     }
+    #output {
+      white-space: pre-line;
+      font-family: monospace;
+      background: var(--white);
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      box-shadow: 0 0 5px var(--shadow);
+    }
+    @media (max-width: 600px) {
+      .buttons {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>🎙️ Jester - Assistente Vocale</h1>
-  <p>Clicca sul pulsante e parla: ad esempio "aggiungi latte alla lista della spesa"</p>
-  <button onclick="startRecognition()">Inizia a Parlare</button>
+  <header>
+  <h1>🎤 Jester</h1>
+  <nav>
+    <button onclick="document.querySelector('.nav-menu').classList.toggle('open')">☰</button>
+  </nav>
+  <div style="margin-top: 0.5rem;">
+    <label for="utente">👤 Utente:</label>
+    <select id="utente" onchange="selezionaUtente()">
+  <option value="ospite">Ospite</option>
+  <option value="gaetano">Gaetano</option>
+</select>
+  </div>
+</header>
+  <aside class="nav-menu">
+    <h2>📂 Menu</h2>
+    <ul>
+$1
+<li><a href="#" onclick="scrollToUtente()">👥 Cambia Utente</a></li>
+</ul>
+  </aside>
+  <main>
+    <section id="home">
+  <h2>🏠 Home</h2>
+  <p>Benvenuto in Jester, il tuo assistente vocale personale per la spesa e il controllo delle scorte. Usa i comandi vocali o i pulsanti per iniziare.</p>
+</section>
+<section id="liste">
+  <h2>🛒 Liste</h2>
+  <p>Gestisci i tuoi acquisti tra supermercato e online.</p>
+  <button onclick="preparaSpesa()" style="margin: 1rem auto; display: block;">🧺 Prepara Spesa</button>
+  <h3>Lista Supermercato</h3>
+  <ul id="lista-supermercato"></ul>
+  <h3>Lista Online</h3>
+  <ul id="lista-online"></ul>
+</section>
+    
+    <button onclick="preparaSpesa()" style="margin: 1rem auto; display: block;">🧺 Prepara Spesa</button>
+    <h3>Lista Online</h3>
+    <ul id="lista-online"></ul>
+  </div>
+</section>
+    <section id="acquisti">
+  <h2>✅ Acquisti</h2>
+  <p>Prodotti già acquistati saranno spuntati automaticamente o possono essere segnati manualmente tramite il comando dedicato.</p>
+</section>
+    <section id="preferiti">
+  <h2>🌟 Preferiti</h2>
+  <p>Registra qui i tuoi prodotti preferiti, come un vino, un formaggio o un piatto speciale. Saranno suggeriti automaticamente per futuri acquisti.</p>
+  <form onsubmit="aggiungiPreferito(event)" style="margin-top:1rem;">
+    <label for="nome-preferito">Nome prodotto:</label>
+    <input id="nome-preferito" type="text" required style="margin: 0.5rem 0; padding: 0.3rem; width: 100%; max-width: 300px;">
+    <button type="submit">➕ Aggiungi ai preferiti</button>
+  </form>
+  <ul id="lista-preferiti"></ul>
+</section>
+    <section id="statistiche">
+  <h2>📊 Statistiche</h2>
+  <p>Analisi dei tuoi acquisti e abitudini di spesa.</p>
+  <div id="stats-output" style="margin-top: 1rem; background: #fff; padding: 1rem; border-radius: 8px; box-shadow: 0 0 5px rgba(0,0,0,0.1); font-family: monospace;"></div>
+<div style="margin-top: 1rem;">
+  <label>Completamento della lista:</label>
+  <div style="background:#eee; border-radius:8px; overflow:hidden; width:100%; max-width:400px;">
+    <div id="progress-bar" style="height:20px; background:#4CAF50; width:0%; transition:width 0.5s;"></div>
+  </div>
+</div>
+</section>
+    <section id="impostazioni">
+  <h2>⚙️ Impostazioni</h2>
+  <p>Personalizza Jester: gestisci il budget, ripristina dati, o modifica le tue preferenze vocali.</p>
+</section>
+    <div class="buttons">
+      <button onclick="startRecognition()">🎙️ Inizia a Parlare</button>
+      <button onclick="generaListaTestuale()">📝 Scarica Lista Spesa</button>
+      <button onclick="marcaAcquistato()">✅ Marca Prodotto Acquistato</button>
+      <button onclick="svuotaAcquisti()">🗑️ Svuota Tutti i Comprati</button>
+      <button onclick="ripristinaListe()">♻️ Ripristina Liste Precedenti</button>
+    </div>
+    <div id="output">📝 Output vocale e messaggi appariranno qui...</div>
+  </main>
+<script>
+// Caricamento lista supermercato e online da localStorage
+const ulSupermercato = document.getElementById('lista-supermercato');
+const ulOnline = document.getElementById('lista-online');
 
-  <div id="output">📝 Output vocale apparirà qui...</div>
+function caricaListe() {
+  aggiornaStatistiche();
+  const sm = JSON.parse(localStorage.getItem(`jester_${utenteAttivo}_supermercato`)) || [];
+  const on = JSON.parse(localStorage.getItem(`jester_${utenteAttivo}_online`)) || [];
+  ulSupermercato.innerHTML = sm.map((item, i) => `<li>${item} <button onclick="rimuoviElementoLista('jester_supermercato', ${i}, 'supermercato')" style="margin-left:10px">❌</button></li>`).join('');
+  ulOnline.innerHTML = on.map((item, i) => `<li>${item} <button onclick="rimuoviElementoLista('jester_online', ${i}, 'online')" style="margin-left:10px">❌</button></li>`).join('');
+}
+caricaListe();
 
-  <script>
-    const output = document.getElementById('output');
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+// Gestione preferiti
+let preferiti = JSON.parse(localStorage.getItem(`jester_${utenteAttivo}_preferiti`)) || [];
+const listaPreferiti = document.getElementById('lista-preferiti');
 
-    if (!SpeechRecognition) {
-      output.innerText = '❌ Il tuo browser non supporta il riconoscimento vocale.';
-    }
+function aggiornaPreferiti() {
+  listaPreferiti.innerHTML = preferiti.map((p, i) => `<li>${p} <button onclick="rimuoviPreferito(${i})" style="margin-left:10px">❌</button></li>`).join('');
+}</li>`).join('');
+}
 
-    function startRecognition() {
-      const recognition = new SpeechRecognition();
-      recognition.lang = 'it-IT';
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
+function aggiungiPreferito(event) {
+  event.preventDefault();
+  const input = document.getElementById('nome-preferito');
+  const val = input.value.trim();
+  if (val && !preferiti.includes(val)) {
+    preferiti.push(val);
+    localStorage.setItem(`jester_${utenteAttivo}_preferiti`, JSON.stringify(preferiti));
+    aggiornaPreferiti();
+  }
+  input.value = '';
+}
 
-      recognition.start();
-      output.innerText = '🎙️ Ascolto in corso...';
+aggiornaPreferiti();
+function rimuoviPreferito(index) {
+  if (index > -1) {
+    preferiti.splice(index, 1);
+    localStorage.setItem('jester_preferiti', JSON.stringify(preferiti));
+    aggiornaPreferiti();
+  }
+}
+function rimuoviElementoLista(storageKey, index, tipo) {
+  let lista = JSON.parse(localStorage.getItem(storageKey)) || [];
+  if (index > -1) {
+    lista.splice(index, 1);
+    localStorage.setItem(storageKey, JSON.stringify(lista));
+  aggiornaStatistiche();
+    if (tipo === 'supermercato') caricaListe();
+    if (tipo === 'online') caricaListe();
+  }
+}
 
-      recognition.onresult = function(event) {
-        const transcript = event.results[0][0].transcript;
-        output.innerText = '✅ Hai detto: "' + transcript + '"';
+// Statistiche semplificate
+function aggiornaStatistiche() {
+  const sm = JSON.parse(localStorage.getItem('jester_supermercato')) || [];
+  const on = JSON.parse(localStorage.getItem('jester_online')) || [];
+  const acqSm = JSON.parse(localStorage.getItem(`jester_${utenteAttivo}_acquisti_supermercato`)) || [];
+  const acqOn = JSON.parse(localStorage.getItem(`jester_${utenteAttivo}_acquisti_online`)) || [];
+  const output = document.getElementById('stats-output');
+  const percent = Math.round(((acqSm.length + acqOn.length) / (sm.length + on.length + acqSm.length + acqOn.length)) * 100) || 0;
+  output.innerText = `
+Totale in lista supermercato: ${sm.length}
+Totale in lista online: ${on.length}
+Acquistati supermercato: ${acqSm.length}
+Acquistati online: ${acqOn.length}
+Prodotti totali acquistati: ${acqSm.length + acqOn.length}
+Percentuale lista completata: ${percent}%
+`;
+  const bar = document.getElementById('progress-bar');
+  bar.style.width = percent + '%';
+  if (percent < 33) {
+    bar.style.background = '#e53935'; // rosso
+  } else if (percent < 66) {
+    bar.style.background = '#fbc02d'; // giallo
+  } else {
+    bar.style.background = '#4CAF50'; // verde
+  }
+}
 
-        // Simulazione logica (da sostituire con backend/funzione reale)
-        if (transcript.toLowerCase().includes("latte")) {
-          output.innerText += '\n📦 Latte aggiunto alla lista del supermercato';
-        } else if (transcript.toLowerCase().includes("pane")) {
-          output.innerText += '\n📦 Pane aggiunto alla lista online';
-        } else {
-          output.innerText += '\nℹ️ Nessuna azione riconosciuta';
-        }
-      };
+aggiornaStatistiche();
+// Prepara Spesa: rimuove i prodotti acquistati da entrambe le liste
+function preparaSpesa() {
+  const sm = JSON.parse(localStorage.getItem('jester_supermercato')) || [];
+  const on = JSON.parse(localStorage.getItem('jester_online')) || [];
+  const acqSm = JSON.parse(localStorage.getItem('jester_acquisti_supermercato')) || [];
+  const acqOn = JSON.parse(localStorage.getItem('jester_acquisti_online')) || [];
+  const nuovaSm = sm.filter(p => !acqSm.includes(p));
+  const nuovaOn = on.filter(p => !acqOn.includes(p));
+  localStorage.setItem(`jester_${utenteAttivo}_supermercato`, JSON.stringify(nuovaSm));
+  localStorage.setItem(`jester_${utenteAttivo}_online`, JSON.stringify(nuovaOn));
+  caricaListe();
+  aggiornaStatistiche();
+  document.getElementById('output').innerText = '🧺 Spesa aggiornata: rimossi i prodotti già acquistati.';
+}
+// Gestione utente mock
+function selezionaUtente() {
+  const selettore = document.getElementById('utente');
+  const nome = selettore.value;
+  localStorage.setItem('jester_utente_corrente', nome);
+  location.reload();
+}
 
-      recognition.onerror = function(event) {
-        output.innerText = '❌ Errore nel riconoscimento: ' + event.error;
-      };
-    }
-  </script>
+const utenteAttivo = localStorage.getItem('jester_utente_corrente') || 'ospite';
+document.getElementById('utente').value = utenteAttivo;
+
+// Tutte le future chiavi localStorage dovrebbero ora usare il prefisso utente
+// Esempio: localStorage.getItem(`jester_${utenteAttivo}_supermercato`)
+function scrollToUtente() {
+  document.getElementById('utente').scrollIntoView({ behavior: 'smooth' });
+  document.querySelector('.nav-menu').classList.remove('open');
+});
+}
+</script>
 </body>
 </html>
