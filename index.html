@@ -476,11 +476,46 @@
 renderLocalList();
 document.body.insertAdjacentHTML('beforeend', '<button id="scan-receipt-btn" style="display:none;"></button>');
 function openChatAssist() {
-    // Placeholder: apri overlay ChatGPT Operator
-    const url = 'https://jester-voice-test.vercel.app/chat-assist';
-    window.open(url, '_blank');
+   const ul = document.querySelector(`#lista-${listId}`);
+  const items = [...ul.querySelectorAll('li')].map(li => li.textContent.trim());
+  if (!items.length) {
+      alert('La lista è vuota.');
+      return;
+  }
+  document.getElementById('chat-overlay').style.display = 'block';
+  document.getElementById('chat-body').innerHTML = '<p>Caricamento...</p>';
+
+  fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items })
+  })
+  .then(r => r.json())
+  .then(data => {
+      const html = data.results.map((r,i)=>
+        `<div>
+          <input type="checkbox" id="sel${i}" data-link="${r.link}">
+          <label for="sel${i}">${r.name} - €${r.price} (${r.seller}, ${r.delivery}gg)</label>
+        </div>`).join('');
+      document.getElementById('chat-body').innerHTML = html + '<button id="chat-confirm">Procedi all\'acquisto</button>';
+      document.getElementById('chat-confirm').addEventListener('click', () => {
+          const links = [...document.querySelectorAll('#chat-body input:checked')].map(cb => cb.dataset.link);
+          if(!links.length){alert('Nessun prodotto selezionato');return;}
+          links.forEach(l => window.open(l, '_blank'));
+          document.getElementById('chat-overlay').style.display = 'none';
+      });
+  })
+  .catch(()=>document.getElementById('chat-body').innerHTML='Errore nella richiesta.');indow.open(url, '_blank');
 }
 ();
   </script>
-</body>
+</
+  <div id="chat-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,.6); z-index:1000;">
+  <div style="background:#fff; margin:5% auto; padding:1rem; width:90%; max-width:600px; height:80%; overflow:auto;" id="chat-content">
+    <button id="chat-close" style="float:right;">&times;</button>
+    <h3>Chat Assist</h3>
+    <div id="chat-body"></div>
+  </div>
+</div>
+</body>>
 </html>
