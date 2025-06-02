@@ -70,6 +70,11 @@ main {
 /* ---------- FOOTER / BUTTONS ---------- */
 .controls {
   display: flex;
+    position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
   justify-content: space-around;
   padding: .5rem;
   background: #fff;
@@ -103,6 +108,11 @@ main {
   main { padding: 2rem; }
 
   .controls {
+      position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: auto;
     flex-direction: column;
     width: 60px;
     height: 100vh;
