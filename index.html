@@ -123,19 +123,13 @@
   <nav>
     <button onclick="document.querySelector('.nav-menu').classList.toggle('open')">☰</button>
   </nav>
-  <div style="margin-top: 0.5rem;">
-    <label for="utente">👤 Utente:</label>
-    <select id="utente" onchange="selezionaUtente()">
-  <option value="ospite">Ospite</option>
-  <option value="gaetano">Gaetano</option>
-</select>
-  </div>
+  
 </header>
   <aside class="nav-menu">
     <h2>📂 Menu</h2>
     <ul>
 $1
-<li><a href="#" onclick="scrollToUtente()">👥 Cambia Utente</a></li>
+
 </ul>
   </aside>
   <main>
@@ -187,13 +181,10 @@ $1
   <h2>⚙️ Impostazioni</h2>
   <p>Personalizza Jester: gestisci il budget, ripristina dati, o modifica le tue preferenze vocali.</p>
 </section>
-    <div class="buttons">
-      <button onclick="startRecognition()">🎙️ Inizia a Parlare</button>
-      <button onclick="generaListaTestuale()">📝 Scarica Lista Spesa</button>
-      <button onclick="marcaAcquistato()">✅ Marca Prodotto Acquistato</button>
-      <button onclick="svuotaAcquisti()">🗑️ Svuota Tutti i Comprati</button>
-      <button onclick="ripristinaListe()">♻️ Ripristina Liste Precedenti</button>
-    </div>
+    $1
+  <button onclick="document.getElementById('cameraInput').click()">📷 Scatta Foto (Scontrino)</button>
+  <input type="file" accept="image/*" capture="environment" id="cameraInput" style="display:none" onchange="handlePhotoUpload(event)">
+</div>
     <div id="output">📝 Output vocale e messaggi appariranno qui...</div>
   </main>
 <script>
@@ -215,9 +206,7 @@ let preferiti = JSON.parse(localStorage.getItem(`jester_${utenteAttivo}_preferit
 const listaPreferiti = document.getElementById('lista-preferiti');
 
 function aggiornaPreferiti() {
-  listaPreferiti.innerHTML = preferiti.map((p, i) => `<li>${p} <button onclick="rimuoviPreferito(${i})" style="margin-left:10px">❌</button></li>`).join('');
-}</li>`).join('');
-}
+  listaPreferiti.innerHTML = preferiti.map((p, i) => `<li>${p} <button onclick="rimuoviPreferito(${i})" style="margin-left:10px">❌</button></li>`).join('');}
 
 function aggiungiPreferito(event) {
   event.preventDefault();
@@ -292,23 +281,59 @@ function preparaSpesa() {
   aggiornaStatistiche();
   document.getElementById('output').innerText = '🧺 Spesa aggiornata: rimossi i prodotti già acquistati.';
 }
-// Gestione utente mock
-function selezionaUtente() {
-  const selettore = document.getElementById('utente');
-  const nome = selettore.value;
-  localStorage.setItem('jester_utente_corrente', nome);
-  location.reload();
-}
-
-const utenteAttivo = localStorage.getItem('jester_utente_corrente') || 'ospite';
-document.getElementById('utente').value = utenteAttivo;
-
-// Tutte le future chiavi localStorage dovrebbero ora usare il prefisso utente
-// Esempio: localStorage.getItem(`jester_${utenteAttivo}_supermercato`)
-function scrollToUtente() {
-  document.getElementById('utente').scrollIntoView({ behavior: 'smooth' });
+);
   document.querySelector('.nav-menu').classList.remove('open');
 });
+// Gestione foto scontrino
+function handlePhotoUpload(event) {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      let confermeOCR = JSON.parse(localStorage.getItem('jester_ocr_confirmed')) || [];
+const ocrRisultatoSimulato = confermeOCR.length ? confermeOCR : ['latte', 'uova', 'caffe'];
+let proposta = ocrRisultatoSimulato.filter(p =>
+  ulSupermercato.innerHTML.toLowerCase().includes(p) || ulOnline.innerHTML.toLowerCase().includes(p)
+);
+if (proposta.length > 0) {
+  const confermati = prompt(`📸 Prodotti rilevati: ${proposta.join(', ')}
+Inserisci quelli da confermare separati da virgola:`);
+  if (confermati) {
+    let nuovi = [];
+    const confermatiArray = confermati.split(',').map(x => x.trim().toLowerCase());
+confermatiArray.forEach(p => {
+  if (!acquisti.supermercato.includes(p) && !acquisti.online.includes(p)) {
+    if (ulSupermercato.innerHTML.toLowerCase().includes(p)) {
+      acquisti.supermercato.push(p);
+      nuovi.push(p);
+    } else if (ulOnline.innerHTML.toLowerCase().includes(p)) {
+      acquisti.online.push(p);
+      nuovi.push(p);
+    }
+  }
+});
+// Salva i prodotti confermati per migliorare il riconoscimento
+localStorage.setItem('jester_ocr_confirmed', JSON.stringify([...new Set([...confermeOCR, ...confermatiArray])])) ;
+          nuovi.push(p);
+        } else if (ulOnline.innerHTML.toLowerCase().includes(p)) {
+          acquisti.online.push(p);
+          nuovi.push(p);
+        }
+      }
+    });
+    localStorage.setItem(`jester_${utenteAttivo}_acquisti_supermercato`, JSON.stringify(acquisti.supermercato));
+    localStorage.setItem(`jester_${utenteAttivo}_acquisti_online`, JSON.stringify(acquisti.online));
+    aggiornaStatistiche();
+    document.getElementById('output').innerText = `📸 Prodotti confermati: ${nuovi.join(', ')}`;
+  } else {
+    document.getElementById('output').innerText = '⚠️ Nessun prodotto confermato.';
+  }
+} else {
+  document.getElementById('output').innerText = '❌ Nessun prodotto rilevato nella lista attuale.';
+}
+    };
+    reader.readAsDataURL(file);
+  }
 }
 </script>
 </body>
