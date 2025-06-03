@@ -86,5 +86,13 @@
         .catch(err => console.error("❌ Registrazione SW fallita:", err));
     }
   </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/serviceWorker.js')
+        .then(reg => console.log('✅ Service Worker registrato:', reg.scope))
+        .catch(err => console.error('❌ Errore SW:', err));
+    }
+  </script>
 </body>
 </html>
