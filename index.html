@@ -3,519 +3,88 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jester – Modulo Vocale (Demo)</title>
+  <title>Jester OCR GPT</title>
   <style>
-    :root {
-      --green: #4CAF50;
-      --red:   #e53935;
-      --light: #f4f4f4;
-      --white: #fff;
-      --gray:  #ddd;
-      --shadow: rgba(0,0,0,0.1);
-    }
-    * { box-sizing: border-box; }
     body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      background: var(--light);
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      background: #f9f9f9;
       color: #333;
     }
-    header {
-      background: var(--green);
-      color: #fff;
-      padding: 1rem 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+    h1 {
+      color: #4CAF50;
     }
-    header h1 {
-      font-size: 1.2rem;
-      margin: 0;
-    }
-    header button {
-      background: none;
+    button {
+      padding: 0.6rem 1.2rem;
+      background: #4CAF50;
+      color: white;
       border: none;
-      color: #fff;
-      font-size: 1.6rem;
-      cursor: pointer;
-    }
-    main {
-      padding: 1rem;
-      max-width: 800px;
-      margin: auto;
-    }
-    .card {
-      background: var(--white);
-      border-radius: 10px;
-      box-shadow: 0 0 10px var(--shadow);
-      padding: 1rem;
-      margin: 1rem 0;
-    }
-    /* Banner di conferma (inizialmente nascosto) */
-    #confirmBanner {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--white);
-      border: 1px solid var(--gray);
-      box-shadow: 0 0 5px var(--shadow);
-      padding: 1rem 1.5rem;
       border-radius: 8px;
-      display: none;
-      z-index: 1000;
-    }
-    #confirmBanner p {
-      margin: 0 0 0.5rem 0;
-    }
-    #confirmBanner button {
-      margin-right: 0.5rem;
-      padding: 0.5rem 0.8rem;
-      border: none;
-      border-radius: 6px;
       cursor: pointer;
-      font-size: 0.9rem;
+      margin-top: 1rem;
     }
-    #confirmYes {
-      background: var(--green);
-      color: #fff;
+    #output {
+      margin-top: 1rem;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 8px;
+      white-space: pre-line;
     }
-    #confirmNo {
-      background: var(--red);
-      color: #fff;
-    }
-    /* Lista fittizia di “Supermercato” */
-    #lista-supermercato {
-      list-style: none;
-      padding: 0;
-      margin: 0.5rem 0 0;
-    }
-    #lista-supermercato li {
-      padding: 0.5rem;
-      border-bottom: 1px solid var(--gray);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    #lista-supermercato li:last-child {
-      border-bottom: none;
-    }
-    #lista-supermercato .remove-btn {
-      background: transparent;
-      border: none;
-      color: var(--red);
-      font-size: 1rem;
-      cursor: pointer;
-    }
-    /* Stato microfono */
-    #voiceStatus {
-      font-size: 0.9rem;
-    }
-    /* Toast di conferma */
-#toast {
-  position: fixed;
-  left: 50%;
-  bottom: 1.5rem;
-  transform: translateX(-50%);
-  background: #4CAF50;
-  color: #fff;
-  padding: 0.75rem 1.5rem;
-  border-radius: 30px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  font-size: 0.95rem;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-  z-index: 99999;
-}
-#toast.show {
-  opacity: 1;
-  animation: fadeOut 2s 1s forwards;
-}
-@keyframes fadeOut {
-  to { opacity: 0; }
-}
-
   </style>
 </head>
 <body>
-  <header>
-    <h1>🎤 Jester (Demo Vocale)</h1>
-    <button id="voiceToggle">🎙️</button>
-  </header>
+  <h1>📷 Jester – OCR con GPT</h1>
+  <p>Carica uno scontrino per estrarre i prodotti.</p>
 
-  <main>
-     <section id="liste">
-    <h2>🛒 Liste</h2>
+  <input type="file" accept="image/*" capture="environment" id="cameraInput" onchange="handlePhotoUpload(event)" style="display:none;">
+  <button onclick="document.getElementById('cameraInput').click()">Scatta Foto (Scontrino)</button>
 
-    <!-- Lista Supermercato -->
-    <h3>Lista <button id="chat-sm" class="chat-btn" title="Chat Assist">💬</button> <button id="quick-add-sm" class="quick-add-btn" title="Aggiungi">+</button> Supermercato</h3>
-    <div class="add-row">
-      <input id="input-sm" placeholder="Aggiungi prodotto…" />
-      <button id="btn-sm" class="add-btn" data-list="supermercato">➕</button>
-    </div>
-    <ul id="lista-supermercato"></ul>
+  <div id="output">📋 Prodotti rilevati appariranno qui...</div>
 
-    <!-- Lista Online -->
-    <h3>Lista Online <button id="chat-online" class="chat-btn" title="Chat Assist">💬</button> <button id="quick-add-online" class="quick-add-btn" title="Aggiungi">+</button></h3>
-    <div class="add-row">
-      <input id="input-on" placeholder="Aggiungi prodotto…" />
-      <button id="btn-on" class="add-btn" data-list="online">➕</button>
-    </div>
-    <ul id="lista-online"></ul>
-  </section>
- <!-- Sezione di riepilogo lista Supermercato (fittizia) -->
-    <section class="card">
-      <h2>🛒 Lista Supermercato</h2>
-      <ul id="lista-supermercato">
-        <li>(vuota)</li>
-      </ul>
-    </section>
-
-    <!-- Status microfono e messaggi di debug -->
-    <section class="card">
-      <h2>📢 Stato Microfono & Comandi</h2>
-      <p id="voiceStatus">Microfono inattivo</p>
-      <p id="debugText"></p>
-    </section>
-  </main>
-
-  <!-- Banner di conferma per Aggiungi/Rimuovi -->
-  <div id="confirmBanner">
-    <p id="confirmMessage">[Messaggio di conferma]</p>
-    <button id="confirmYes">Sì</button>
-    <button id="confirmNo">No</button>
-  </div>
-
-  <!-- Script JavaScript -->
-<!-- Toast di conferma -->
-<div id="toast"></div>
-
-    // Mostra un messaggio di conferma animato
-  function showToast(msg = "Operazione completata!") {
-    const toast = document.getElementById("toast");
-    toast.textContent = msg;
-    toast.classList.add("show");
-    setTimeout(() => toast.classList.remove("show"), 2500);
-  }
-
-  </script><    // Verifichiamo il supporto al Web Speech API
-    window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition || null;
-    if (!window.SpeechRecognition) {
-      document.getElementById('voiceStatus').innerText = "Il tuo browser non supporta il riconoscimento vocale.";
-    }
-
-    // Stato globale
-    let recognizing = false;
-    let currentIntent = null;   // { type: "Aggiungi"|"Rimuovi", prodotto: string, quantita: number, unita: string, lista: "supermercato"|"online" }
-    let recognition;            // oggetto SpeechRecognition
-
-    // Riferimenti a elementi DOM
-    const voiceToggle    = document.getElementById('voiceToggle');
-    const voiceStatus    = document.getElementById('voiceStatus');
-    const debugText      = document.getElementById('debugText');
-    const confirmBanner  = document.getElementById('confirmBanner');
-    const confirmMessage = document.getElementById('confirmMessage');
-    const confirmYes     = document.getElementById('confirmYes');
-    const confirmNo      = document.getElementById('confirmNo');
-    const listaSuper     = document.getElementById('lista-supermercato');
-
-    // Inizializzazione di SpeechRecognition
-    if (window.SpeechRecognition) {
-      recognition = new window.SpeechRecognition();
-      recognition.lang = 'it-IT';
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
-
-      recognition.addEventListener('start', () => {
-        recognizing = true;
-        voiceStatus.innerText = "🎧 Ascoltando...";
-        debugText.innerText = "";
+  <script>
+    async function inviaFotoAVercel(base64Image) {
+      const res = await fetch('/api/ocr-gpt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ base64Image })
       });
 
-      recognition.addEventListener('end', () => {
-        recognizing = false;
-        voiceStatus.innerText = "Microfono inattivo";
-      });
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error('Errore OCR via Vercel: ' + err);
+      }
 
-      recognition.addEventListener('error', (e) => {
-        recognizing = false;
-        voiceStatus.innerText = "Errore di riconoscimento: " + e.error;
-      });
-
-      recognition.addEventListener('result', (event) => {
-        const transcript = event.results[0][0].transcript.trim();
-        debugText.innerText = `➡️ Hai detto: "${transcript}"`;
-        parseIntent(transcript.toLowerCase());
-      });
+      const result = await res.json();
+      return result.choices?.[0]?.message?.content || '';
     }
 
-    // Avvia/ferma il riconoscimento quando si clicca il pulsante 🎙️
-    voiceToggle.addEventListener('click', () => {
-      if (!window.SpeechRecognition) return;
+    function handlePhotoUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
 
-      if (recognizing) {
-        recognition.stop();
-        return;
-      }
-      recognition.start();
-    });
+      const reader = new FileReader();
+      reader.onload = async function (e) {
+        const base64Image = e.target.result;
+        document.getElementById('output').innerText = '🧠 Analisi in corso...';
 
-    // Funzione di parsing intent (molto basica, con regex)
-    function parseIntent(text) {
-      // Reset dell’intent corrente
-      currentIntent = null;
-
-      // Pattern “Aggiungi [quantità] [unità]? [prodotto] alla lista del (supermercato|online)”
-      const aggiungiPattern = /aggiungi\s+(\d+)?\s*(litri?|litro|pezzi?|pz|kg|grammi?|g)?\s*([a-zàèéìòù ]+?)\s+alla\s+lista(?:\s+del)?\s+(supermercato|online)/;
-      // Pattern “Togli|Rimuovi [prodotto] dalla lista (supermercato|online)”
-      const rimuoviPattern = /(togli|rimuovi)\s+([a-zàèéìòù ]+?)\s+dalla\s+lista(?:\s+del)?\s+(supermercato|online)/;
-
-      let m;
-      if ((m = aggiungiPattern.exec(text))) {
-        // Estraggo quantità (opzionale) e unità (opzionale)
-        const rawQty = m[1];
-        const rawUn = m[2];
-        let quantita = 1;
-        let unita = "";
-
-        if (rawQty) {
-          quantita = parseInt(rawQty, 10);
+        try {
+          const risposta = await inviaFotoAVercel(base64Image);
+          document.getElementById('output').innerText = `📋 Prodotti rilevati:\n${risposta}`;
+        } catch (err) {
+          document.getElementById('output').innerText = '❌ Errore: ' + err.message;
         }
-        if (rawUn) {
-          unita = rawUn;
-        }
+      };
 
-        const prodotto = m[3].trim();
-        const lista    = m[4];
-
-        currentIntent = {
-          type: "Aggiungi",
-          prodotto: prodotto,
-          quantita: quantita,
-          unita: unita,
-          lista: lista
-        };
-      }
-      else if ((m = rimuoviPattern.exec(text))) {
-        const prodotto = m[2].trim();
-        const lista    = m[3];
-        currentIntent = {
-          type: "Rimuovi",
-          prodotto: prodotto,
-          lista: lista
-        };
-        else if (text.includes('apri assistente')) {
-            openChatAssist();
-            return;
-        }
-        else if (text.includes('scansiona scontrino')) {
-            document.getElementById('scan-receipt-btn')?.click();
-            return;
-        }
-      }
-      else {
-        // Non ho riconosciuto alcun pattern valido
-        speakText("Non ho capito. Puoi ripetere?");
-        return;
-      }
-
-      // Se siamo arrivati qui, abbiamo un intent valido: chiediamo conferma
-      askForConfirmation();
+      reader.readAsDataURL(file);
     }
-
-    // Mostra banner di conferma
-    function askForConfirmation() {
-      if (!currentIntent) return;
-
-      let msg = "";
-      if (currentIntent.type === "Aggiungi") {
-        msg = `Hai chiesto di aggiungere ${currentIntent.quantita} ${currentIntent.unita || ""} ${currentIntent.prodotto} alla lista ${currentIntent.lista}. Confermi?`;
-      }
-      else if (currentIntent.type === "Rimuovi") {
-        msg = `Hai chiesto di rimuovere ${currentIntent.prodotto} dalla lista ${currentIntent.lista}. Confermi?`;
-      }
-      confirmMessage.innerText = msg;
-      confirmBanner.style.display = "block";
-
-      // Mantenere la lettura vocale del messaggio di conferma
-      speakText(msg);
-    }
-
-    // Se l’utente clicca “Sì”
-    confirmYes.addEventListener('click', () => {
-      confirmBanner.style.display = "none";
-      executeIntent();
-    });
-
-    // Se l’utente clicca “No”
-    confirmNo.addEventListener('click', () => {
-      confirmBanner.style.display = "none";
-      speakText("Operazione annullata.");
-      currentIntent = null;
-    });
-
-    // Esegue l’intent confermato (fittizio – qui simulo le chiamate API)
-    function executeIntent() {
-      if (!currentIntent) return;
-
-      if (currentIntent.type === "Aggiungi") {
-        // Simulo una POST a /api/lista/aggiungi
-        const payload = {
-          userId: "UTENTE_DEMO",
-          lista: currentIntent.lista,
-          prodotti: [
-            {
-              nome: currentIntent.prodotto,
-              quantita: currentIntent.quantita,
-              unita: currentIntent.unita
-            }
-          ],
-          timestamp: new Date().toISOString()
-        };
-        debugText.innerText = "📡 [Simulazione] Chiamata API /api/lista/aggiungi\n" + JSON.stringify(payload, null, 2);
-
-        // Aggiorno localmente la lista “Supermercato” solo per demo
-        if (currentIntent.lista === "supermercato") {
-          addToLocalList(currentIntent.prodotto, currentIntent.quantita, currentIntent.unita);
-          speakText(`Ho aggiunto ${currentIntent.quantita} ${currentIntent.unita || ""} ${currentIntent.prodotto} alla lista del supermercato.`);
-        } else {
-          speakText(`(Demo) Aggiungo ${currentIntent.prodotto} alla lista online.`);
-        }
-      }
-      else if (currentIntent.type === "Rimuovi") {
-        // Simulo una POST a /api/lista/rimuovi
-        const payload = {
-          userId: "UTENTE_DEMO",
-          lista: currentIntent.lista,
-          prodotto: currentIntent.prodotto,
-          timestamp: new Date().toISOString()
-        };
-        debugText.innerText = "📡 [Simulazione] Chiamata API /api/lista/rimuovi\n" + JSON.stringify(payload, null, 2);
-
-        // Rimuovo da lista locale se esiste
-        if (currentIntent.lista === "supermercato") {
-          removeFromLocalList(currentIntent.prodotto);
-          speakText(`Ho rimosso ${currentIntent.prodotto} dalla lista del supermercato.`);
-        } else {
-          speakText(`(Demo) Rimuovo ${currentIntent.prodotto} dalla lista online.`);
-        }
-      }
-
-      currentIntent = null;
-    }
-
-    // Funzione di sintesi vocale (Text-to-Speech)
-    function speakText(text) {
-      if (!window.speechSynthesis) return;
-      const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = 'it-IT';
-      window.speechSynthesis.speak(utter);
-    }
-
-    // Gestione lista “Supermercato” in locale (solo per demo)
-    let localSuperList = []; // array di nomi di prodotto
-    function renderLocalList() {
-      listaSuper.innerHTML = "";
-      if (localSuperList.length === 0) {
-        listaSuper.innerHTML = "<li>(vuota)</li>";
-        return;
-      }
-      localSuperList.forEach((item, idx) => {
-        const li = document.createElement('li');
-        li.innerText = item;
-        const btn = document.createElement('button');
-        btn.className = "remove-btn";
-        btn.innerText = "❌";
-        btn.onclick = () => {
-          localSuperList.splice(idx, 1);
-          renderLocalList();
-        };
-        li.appendChild(btn);
-        listaSuper.appendChild(li);
-      });
-    }
-    function addToLocalList(nome, quantita, unita) {
-      const label = quantita > 1
-                    ? `${quantita} ${unita || ""} ${nome}`
-                    : nome;
-      localSuperList.push(label);
-      renderLocalList();
-    }
-    function removeFromLocalList(nome) {
-      // Rimuovo la prima occorrenza che contiene la stringa “nome”
-      const idx = localSuperList.findIndex(item => item.includes(nome));
-      if (idx !== -1) {
-        localSuperList.splice(idx, 1);
-      }
-      renderLocalList();
-    }
-
-  
-      // Toast per aggiunta manuale preferiti
-
-  if (addPrefBtn) {
-    addPrefBtn.addEventListener('click', () => showToast('Prodotto aggiunto! ✅'));
-      // Fallback: toast per qualunque pulsante “+”
-  document.addEventListener('click', function(e) {
-    e.target.closest('[data-toast="add"]') {
-      showToast('Prodotto aggiunto! \u2705');
-   
-        // Imposta automaticamente data-toast="add" su tutti i pulsanti con icona "+"
-    document.querySelectorAll('button').forEach(btn => {
-      const txt = btn.textContent.trim();
-      if (txt === '+' || txt.includes('\u2795')) {
-        btn.setAttribute('data-toast', 'add');
-      }
-    });
-}
-  });
-
-  }
-// All’avvio, mostro lista vuota
-renderLocalList();
-document.body.insertAdjacentHTML('beforeend', '<button id="scan-receipt-btn" style="display:none;"></button>');
-function openChatAssist() {
-   const ul = document.querySelector(`#lista-${listId}`);
-  const items = [...ul.querySelectorAll('li')].map(li => li.textContent.trim());
-  if (!items.length) {
-      alert('La lista è vuota.');
-      return;
-  }
-  document.getElementById('chat-overlay').style.display = 'block';
-  document.getElementById('chat-body').innerHTML = '<p>Caricamento...</p>';
-
-  fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items })
-  })
-  .then(r => r.json())
-  .then(data => {
-      const html = data.results.map((r,i)=>
-        `<div>
-          <input type="checkbox" id="sel${i}" data-link="${r.link}">
-          <label for="sel${i}">${r.name} - €${r.price} (${r.seller}, ${r.delivery}gg)</label>
-        </div>`).join('');
-      document.getElementById('chat-body').innerHTML = html + '<button id="chat-confirm">Procedi all\'acquisto</button>';
-      document.getElementById('chat-confirm').addEventListener('click', () => {
-          const links = [...document.querySelectorAll('#chat-body input:checked')].map(cb => cb.dataset.link);
-          if(!links.length){alert('Nessun prodotto selezionato');return;}
-          links.forEach(l => window.open(l, '_blank'));
-          document.getElementById('chat-overlay').style.display = 'none';
-      });
-  })
-  .catch(()=>document.getElementById('chat-body').innerHTML='Errore nella richiesta.');indow.open(url, '_blank');
-}
-();
   </script>
-</
-  <div id="chat-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,.6); z-index:1000;">
-  <div style="background:#fff; margin:5% auto; padding:1rem; width:90%; max-width:600px; height:80%; overflow:auto;" id="chat-content">
-    <button id="chat-close" style="float:right;">&times;</button>
-    <h3>Chat Assist</h3>
-    <div id="chat-body"></div>
-  </div>
-</div>
-</body>>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/serviceWorker.js')
+        .then(reg => console.log("✅ Service Worker registrato:", reg.scope))
+        .catch(err => console.error("❌ Registrazione SW fallita:", err));
+    }
+  </script>
+</body>
 </html>
