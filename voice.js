@@ -57,6 +57,7 @@
     });
     document.getElementById('list').appendChild(li);
   }
+  window.addItem = addItem;
 
   function removeItem(name) {
     const items = document.querySelectorAll('#list li');
