@@ -1,21 +1,33 @@
-# 📚 JESTER – OCR GPT (Vercel Ready)
+# 🤓 JESTER – Assistente Vocale per la Spesa
+Web app pronta per il deploy su Vercel che unisce comandi vocali, OCR tramite GPT‑ Vision e funzioni PWA.
 
-Questa applicazione permette di caricare uno scontrino e inviarlo a GPT-4 Vision per l'estrazione automatica dei prodotti.
+## Funzionalità principali
+- Aggiunta e rimozione prodotti con voce o clic
+- Gestione due liste: supermercato e online
+- Preferiti con aggiunta rapida
+- Pulsante "segna come acquistato" con statistiche dinamiche
+- Import prodotti da scontrino tramite `/api/ocr-gpt`
+- Generazione lista `.txt` scaricabile
+- Installabile come PWA e funzionante offline
+- Database frasario per comandi vocali in `voice-db.js`
 
-## ✅ Funzionalità
-- Caricamento immagini da fotocamera
-- Invio a OpenAI GPT-4 Vision tramite endpoint /api/ocr-gpt
-- Visualizzazione elenco prodotti riconosciuti
-- Design responsive e mobile-first
+## Struttura progetto
+```
+index.html          ─ interfaccia principale
+serviceWorker.js    ─ caching offline
+manifest.json       ─ configurazione PWA
+api/ocr-gpt.js      ─ endpoint serverless per GPT‑ Vision
+icon-192.png        ─ icona applicazione
+voice-db.js         ─ elenco varianti sintattiche per i comandi
+voice.js            ─ logica di riconoscimento vocale
+```
 
-## 🚀 Deploy
-1. Carica questo progetto su Vercel
-2. In Settings → Environment Variables, aggiungi:
-   ```
-   OPENAI_API_KEY = sk-xxxxx
-   ```
-3. Deploya e apri il dominio
+## Deploy su Vercel
+1. Carica il repository su GitHub
+2. Collega il repo a Vercel
+3. In **Settings → Environment Variables** aggiungi
+   `OPENAI_API_KEY = sk-xxxxx`
+4. Imposta come runtime Node 18 (necessario per `fetch`)
+5. Avvia il deploy
 
-## 🧠 Modello
-Usa `gpt-4-vision-preview` per il riconoscimento visivo.
-
+Dopo il primo caricamento l'app potrà funzionare anche offline.
