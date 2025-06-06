@@ -6,6 +6,9 @@ const urlsToCache = [
   "/icon-192.png",
   "/favicon.ico",
   "/manifest.json"
+    "/voice.js",
+  "/voice-db.js",
+  "/serviceWorker.js"
 ];
 
 // INSTALL CACHE
